@@ -1,0 +1,45 @@
+{
+  "@id": "",
+  "@type": "ns001:Cow",
+  "birthDate": "1980-12-01T00:00:00.000Z",
+  "ns001:healthy": false,
+  "ns001:milkVolume": 30.5,
+  "name": "yoda",
+  "ns001:weight": 124,
+  "@context": {
+      "weight": {
+          "@id": "http://example.com/farm/weight",
+          "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      },
+      "healthy": {
+          "@id": "http://example.com/farm/healthy",
+          "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      },
+      "milkVolume": {
+          "@id": "http://example.com/farm/milkVolume",
+          "@type": "http://www.w3.org/2001/XMLSchema#double"
+      },
+      "name": {
+          "@id": "http://example.com/farm/name"
+      },
+      "birthDate": {
+          "@id": "http://example.com/farm/birthDate",
+          "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+      },
+      "premis": "http://www.loc.gov/premis/rdf/v1#",
+      "test": "info:fedora/test/",
+      "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+      "ns001": "http://example.com/farm/",
+      "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+      "xmlns": "http://www.w3.org/2000/xmlns/",
+      "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+      "fedora": "http://fedora.info/definitions/v4/repository#",
+      "xml": "http://www.w3.org/XML/1998/namespace",
+      "ebucore": "http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#",
+      "ldp": "http://www.w3.org/ns/ldp#",
+      "xs": "http://www.w3.org/2001/XMLSchema",
+      "fedoraconfig": "http://fedora.info/definitions/v4/config#",
+      "foaf": "http://xmlns.com/foaf/0.1/",
+      "dc": "http://purl.org/dc/elements/1.1/"
+  }
+}
