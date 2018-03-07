@@ -52,6 +52,6 @@ Context URIs can be mapped to a files to pre-load contexts so that they can be u
 
 1. Define system properties `compaction.preload.uri.NAME` and `compaction.preload.file.NAME`
 
-     -Dcompaction.preload.uri.my.context.1=http://example.org/context.jsonld
-     -Dcompaction.preload.file.my.context.1=/path/to/file
+       -Dcompaction.preload.uri.my.context.1=http://example.org/context.jsonld
+       -Dcompaction.preload.file.my.context.1=/path/to/file
 
