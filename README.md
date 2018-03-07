@@ -1,5 +1,8 @@
 # Fedora JSON-LD addons
 
+[![Build Status](https://travis-ci.org/DataConservancy/fcrepo-jsonld.svg?branch=master)](https://travis-ci.org/DataConservancy/fcrepo-jsonld)
+
+
 ## Quick start
 
 Add to the global `web.xml` the following filter configuration:
