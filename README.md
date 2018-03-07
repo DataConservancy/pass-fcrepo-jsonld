@@ -5,18 +5,20 @@
 
 ## Quick start
 
-Add to the global `web.xml` the following filter configuration:
+1. Build via `mvn clean install`
+2. Copy the shaded artifact `jsonld-addon-filters/target/jsonld-addon-filters-0.0.1-SNAPSHOT-shaded.jar` to your servlet container's shared library directory, e.g. `${CATALINA_HOME}/common/lib`
+3. Add to the global `web.xml` the following filter configuration:
 
-    <filter>
-      <filter-name>jsonld-compaction-filter</filter-name>
-      <filter-class>org.dataconservancy.fcrepo.jsonld.compact.CompactionFilter</filter-class>
-      <async-supported>true</async-supported>
-    </filter>
+       <filter>
+         <filter-name>jsonld-compaction-filter</filter-name>
+         <filter-class>org.dataconservancy.fcrepo.jsonld.compact.CompactionFilter</filter-class>
+         <async-supported>true</async-supported>
+       </filter>
 
-    <filter-mapping>
-      <filter-name>jsonld-compaction-filter</filter-name>
-      <url-pattern>/*</url-pattern>
-    </filter-mapping>
+       <filter-mapping>
+         <filter-name>jsonld-compaction-filter</filter-name>
+         <url-pattern>/*</url-pattern>
+       </filter-mapping>
 
 ## Configuration
 
