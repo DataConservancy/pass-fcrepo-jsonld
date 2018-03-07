@@ -70,10 +70,6 @@ class ConfigUtil {
     }
 
     public static String getValue(String key) {
-        LOG.info("Getting value of '{}'", key);
-        LOG.info("    prop {}: {}", key, System.getProperty(key));
-        LOG.info("    env {}: {}", key, System.getenv(toEnvName(key)));
-
         return System.getProperty(key, System.getenv(toEnvName(key)));
     }
 

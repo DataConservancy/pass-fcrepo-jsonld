@@ -55,7 +55,7 @@ public class CompactionFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
-        LOG.warn("Initialized compaction filter");
+        LOG.info("Initializing compaction filter");
 
         final String context = Optional.ofNullable(filterConfig.getInitParameter("context")).orElse(getValue(
                 CONTEXT_COMPACTION_URI_PROP));
@@ -82,9 +82,9 @@ public class CompactionFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
 
-        LOG.warn("Servicing response");
+        LOG.debug("Servicing response");
 
-        LOG.info("Initial Output Stream: " + response.getOutputStream());
+        LOG.debug("Initial Output Stream: " + response.getOutputStream());
         final CompactionWrapper compactionWrapper = new CompactionWrapper((HttpServletResponse) response, compactor,
                 defaultContext);
         chain.doFilter(request, compactionWrapper);

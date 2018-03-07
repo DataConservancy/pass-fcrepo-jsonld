@@ -46,7 +46,7 @@ class CompactionWrapper extends HttpServletResponseWrapper {
 
         try {
             delegate = super.getOutputStream();
-            LOG.info("Delegate output stream is " + delegate);
+            LOG.debug("Delegate output stream is " + delegate);
             compactingOutputStream = new CompactingOutputStream(delegate, compactor, context);
         } catch (final IOException e) {
             throw new RuntimeException("Could not open response output stream", e);
@@ -74,7 +74,7 @@ class CompactionWrapper extends HttpServletResponseWrapper {
 
             @Override
             public void close() throws IOException {
-                LOG.info("Closing compacting output stream");
+                LOG.debug("Closing compacting output stream");
                 compactingOutputStream.close();
             }
         };
@@ -92,12 +92,7 @@ class CompactionWrapper extends HttpServletResponseWrapper {
 
     @Override
     public void addHeader(String name, String value) {
-        LOG.info("addHeader {} = {}", name, value);
-
-        if (!name.equalsIgnoreCase("Length")) {
-            super.setHeader(name, value);
-        }
-
+        super.addHeader(name, value);
         if (name.equalsIgnoreCase("content-type") && value.startsWith(JSON_LD_MEDIA_TYPE)) {
             compactingOutputStream.enableCompaction();
         }
@@ -105,12 +100,7 @@ class CompactionWrapper extends HttpServletResponseWrapper {
 
     @Override
     public void setHeader(String name, String value) {
-        LOG.info("setHeader {} = {}", name, value);
-
-        if (!name.equalsIgnoreCase("Length")) {
-            super.setHeader(name, value);
-        }
-
+        super.addHeader(name, value);
         if (name.equalsIgnoreCase("content-type") && value.startsWith(JSON_LD_MEDIA_TYPE)) {
             compactingOutputStream.enableCompaction();
         }

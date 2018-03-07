@@ -75,7 +75,7 @@ public class CompactingOutputStream extends FilterOutputStream {
      * Tell the compactor to do JSON-LD compaction when it starts getting input.
      */
     public void enableCompaction() {
-        LOG.info("Enabling compaction");
+        LOG.debug("Enabling compaction");
         this.compactionEnabled = true;
     }
 
@@ -84,12 +84,12 @@ public class CompactingOutputStream extends FilterOutputStream {
 
         try {
             if (compactionEnabled && context != null) {
-                LOG.info("Doing compaction and writing to {}, which is a {}", super.out, super.out.getClass());
+                LOG.debug("Doing compaction and writing to {}, which is a {}", super.out, super.out.getClass());
                 final String compacted = compactor.compact(new String(captured.toByteArray(), UTF_8), context);
-                LOG.info("Writing compacted jsonld: {}", compacted);
+                LOG.debug("Writing compacted jsonld: {}", compacted);
                 super.out.write(compacted.getBytes(UTF_8));
             } else {
-                LOG.info("Not doing compaction");
+                LOG.debug("Not doing compaction");
             }
         } catch (final Exception e) {
             throw new RuntimeException("Could not compact jsonld", e);
