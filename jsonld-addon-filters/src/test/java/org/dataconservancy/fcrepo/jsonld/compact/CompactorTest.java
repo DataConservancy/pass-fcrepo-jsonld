@@ -16,9 +16,9 @@
 
 package org.dataconservancy.fcrepo.jsonld.compact;
 
+import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.addStaticContext;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.isCompact;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldUtil.addStaticContext;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URL;

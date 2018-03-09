@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.fcrepo.jsonld.compact;
+package org.dataconservancy.fcrepo.jsonld;
 
 import static java.lang.String.join;
-import static org.dataconservancy.fcrepo.jsonld.compact.ConfigUtil.extract;
-import static org.dataconservancy.fcrepo.jsonld.compact.ConfigUtil.props;
-import static org.dataconservancy.fcrepo.jsonld.compact.ConfigUtil.removePrefix;
-import static org.dataconservancy.fcrepo.jsonld.compact.ConfigUtil.toEnvName;
-import static org.dataconservancy.fcrepo.jsonld.compact.ConfigUtil.toPropName;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.extract;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.props;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.removePrefix;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.toEnvName;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.toPropName;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Map;

@@ -16,8 +16,8 @@
 
 package org.dataconservancy.fcrepo.jsonld.compact;
 
-import static org.dataconservancy.fcrepo.jsonld.compact.ConfigUtil.getValue;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldUtil.loadContexts;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.getValue;
+import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.loadContexts;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -30,6 +30,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -82,13 +83,22 @@ public class CompactionFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
 
-        LOG.debug("Servicing response");
+        LOG.debug("Compaction filter is considering response");
 
-        LOG.debug("Initial Output Stream: " + response.getOutputStream());
-        final CompactionWrapper compactionWrapper = new CompactionWrapper((HttpServletResponse) response, compactor,
-                defaultContext);
-        chain.doFilter(request, compactionWrapper);
-        compactionWrapper.getOutputStream().close();
+        final String method = ((HttpServletRequest) request).getMethod();
+
+        if (method.equalsIgnoreCase("GET")) {
+
+            LOG.debug("Compaction filter is compacting");
+            final CompactionWrapper compactionWrapper = new CompactionWrapper((HttpServletResponse) response,
+                    compactor,
+                    defaultContext);
+            chain.doFilter(request, compactionWrapper);
+            compactionWrapper.getOutputStream().close();
+        } else {
+            LOG.debug("Compaction filter is doing nothing");
+            chain.doFilter(request, response);
+        }
     }
 
     @Override

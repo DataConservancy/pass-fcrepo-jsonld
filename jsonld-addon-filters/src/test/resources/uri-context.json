@@ -1,0 +1,10 @@
+{
+  "@id": "http://localhost:8080/rest/farm/kine/eb/5f/90/ff/eb5f90ff-80bb-4c3f-851b-086c4e85c0d8",
+  "@type": "ns001:Cow",
+  "birthDate": "1980-12-01T00:00:00.000Z",
+  "ns001:healthy": false,
+  "ns001:milkVolume": 30.5,
+  "name": "yoda",
+  "ns001:weight": 124,
+  "@context": "http://example.org/farm.jsonld"
+}

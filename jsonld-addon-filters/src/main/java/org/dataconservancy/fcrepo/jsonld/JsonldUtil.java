@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.fcrepo.jsonld.compact;
+package org.dataconservancy.fcrepo.jsonld;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.dataconservancy.fcrepo.jsonld.compact.ConfigUtil.extract;
-import static org.dataconservancy.fcrepo.jsonld.compact.ConfigUtil.props;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.extract;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.props;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

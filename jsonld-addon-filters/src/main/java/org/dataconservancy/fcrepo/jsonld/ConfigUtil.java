@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.fcrepo.jsonld.compact;
+package org.dataconservancy.fcrepo.jsonld;
 
 import static java.util.stream.Stream.concat;
 
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author apb@jhu.edu
  */
-class ConfigUtil {
+public class ConfigUtil {
 
     static final Logger LOG = LoggerFactory.getLogger(ConfigUtil.class);
 

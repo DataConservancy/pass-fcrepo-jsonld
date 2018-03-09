@@ -1,0 +1,6 @@
+<> <http://example.com/farm/birthDate> "1980-12-01T00:00:00.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<> <http://example.com/farm/healthy> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<> <http://example.com/farm/milkVolume> "3.05E1"^^<http://www.w3.org/2001/XMLSchema#double> .
+<> <http://example.com/farm/name> "yoda" .
+<> <http://example.com/farm/weight> "124"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/farm/Cow> .

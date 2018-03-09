@@ -82,7 +82,7 @@ class CompactionWrapper extends HttpServletResponseWrapper {
 
     @Override
     public void setContentLength(int len) {
-        LOG.info("Ignoring content length of {}", len);
+        LOG.debug("Ignoring content length of {}", len);
     }
 
     @Override

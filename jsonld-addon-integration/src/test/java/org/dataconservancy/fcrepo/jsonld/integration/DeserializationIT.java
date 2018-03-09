@@ -18,8 +18,6 @@ package org.dataconservancy.fcrepo.jsonld.integration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
-import static org.apache.commons.io.IOUtils.toInputStream;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.isCompact;
 import static org.junit.Assert.assertTrue;
 
@@ -37,7 +35,7 @@ import org.junit.Test;
 /**
  * @author apb@jhu.edu
  */
-public class CompactionIT {
+public class DeserializationIT {
 
     static final URI SERVER_MANAGED = URI.create("http://fedora.info/definitions/v4/repository#ServerManaged");
 
@@ -45,13 +43,14 @@ public class CompactionIT {
             "fcrepo.dynamic.test.port", "8080"), System.getProperty("fcrepo.cxtPath", "fcrepo"));
 
     @Test
-    public void CompactionTest() throws Exception {
+    public void deserializationTest() throws Exception {
         final FcrepoClient client = new FcrepoClientBuilder().throwExceptionOnFailure().build();
 
         final URI jsonldResource = attempt(60, () -> {
+
             try (FcrepoResponse response = client
                     .post(URI.create(fcrepoBaseURI))
-                    .body(toInputStream(getUncompactedJsonld(), UTF_8), "application/ld+json")
+                    .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
                     .perform()) {
                 return response.getLocation();
             }
@@ -65,7 +64,7 @@ public class CompactionIT {
 
             final String body = IOUtils.toString(response.getBody(), UTF_8);
 
-            assertTrue(isCompact(body));
+            assertTrue(body, isCompact(body));
         }
 
     }
@@ -90,5 +89,4 @@ public class CompactionIT {
         }
         throw new RuntimeException("Failed executing task", caught);
     }
-
 }

@@ -18,12 +18,12 @@ package org.dataconservancy.fcrepo.jsonld.compact;
 
 import static java.lang.String.join;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.COMPACTION_PROP_PRELOAD_FILES;
+import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.COMPACTION_PROP_PRELOAD_URIS;
 import static org.dataconservancy.fcrepo.jsonld.compact.CompactionFilter.CONTEXT_COMPACTION_URI_PROP;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getContextFileLocation;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.isCompact;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldUtil.COMPACTION_PROP_PRELOAD_FILES;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldUtil.COMPACTION_PROP_PRELOAD_URIS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -103,6 +103,7 @@ public class CompactionFilterTest {
         };
 
         when(originalResponse.getOutputStream()).thenReturn(servletOut);
+        when(originalRequest.getMethod()).thenReturn("GET");
 
         chain = new FilterChain() {
 
