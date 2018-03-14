@@ -25,7 +25,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.concurrent.Callable;
 
 import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
@@ -37,12 +36,9 @@ import org.junit.Test;
 /**
  * @author apb@jhu.edu
  */
-public class CompactionIT {
+public class CompactionIT implements FcrepoIT {
 
     static final URI SERVER_MANAGED = URI.create("http://fedora.info/definitions/v4/repository#ServerManaged");
-
-    String fcrepoBaseURI = String.format("http://localhost:%s/%s/rest/", System.getProperty(
-            "fcrepo.dynamic.test.port", "8080"), System.getProperty("fcrepo.cxtPath", "fcrepo"));
 
     @Test
     public void CompactionTest() throws Exception {
@@ -67,28 +63,5 @@ public class CompactionIT {
 
             assertTrue(isCompact(body));
         }
-
     }
-
-    static <T> T attempt(final int times, final Callable<T> it) {
-
-        Throwable caught = null;
-
-        for (int tries = 0; tries < times; tries++) {
-            try {
-                return it.call();
-            } catch (final Throwable e) {
-                caught = e;
-                try {
-                    Thread.sleep(1000);
-                    System.out.println(".");
-                } catch (final InterruptedException i) {
-                    Thread.currentThread().interrupt();
-                    return null;
-                }
-            }
-        }
-        throw new RuntimeException("Failed executing task", caught);
-    }
-
 }
