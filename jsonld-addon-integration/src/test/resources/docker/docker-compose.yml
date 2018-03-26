@@ -1,0 +1,22 @@
+version: '2'
+
+services:
+
+  fuseki:
+    image: oapass/fuseki
+    environment:
+      FUSEKI_PORT: "${FUSEKI_PORT}"
+      REQUEST_SUBSTITUTE_FILTER_HOST: ${REQUEST_SUBSTITUTE_FILTER_HOST}
+      REQUEST_SUBSTITUTE_TERM: "${REQUEST_SUBSTITUTE_TERM}"
+      REQUEST_SUBSTITUTE_REPLACEMENT: "${REQUEST_SUBSTITUTE_REPLACEMENT}"
+      RESPONSE_SUBSTITUTE_FILTER_HOST: ${RESPONSE_SUBSTITUTE_FILTER_HOST}
+      RESPONSE_SUBSTITUTE_TERM: "${RESPONSE_SUBSTITUTE_TERM}"
+      RESPONSE_SUBSTITUTE_REPLACEMENT: "${RESPONSE_SUBSTITUTE_REPLACEMENT}"
+    volumes:
+      # to run manually, use the below instead.  This is ugly, but necessary.  There is no way to specify an absolute
+      # file path on Windows.  Relative paths are different when run as part of ITs or via mvn docker:run
+      #- ../../../../../jsonld-addon-filters/target/jsonld-addon-filters-${project.version}-shaded.jar:/usr/local/tomcat/lib/filters.jar
+      - ../../../../jsonld-addon-filters/target/jsonld-addon-filters-${project.version}-shaded.jar:/usr/local/tomcat/lib/filters.jar
+      - mnt/web.xml:/usr/local/tomcat/webapps/fuseki/WEB-INF/web.xml
+    ports:
+      - "${FUSEKI_PORT}:${FUSEKI_PORT}"
