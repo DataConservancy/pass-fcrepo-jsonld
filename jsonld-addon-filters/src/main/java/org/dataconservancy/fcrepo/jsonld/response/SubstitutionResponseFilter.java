@@ -17,14 +17,18 @@
 package org.dataconservancy.fcrepo.jsonld.response;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.getValue;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.extract;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.props;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -61,51 +65,43 @@ public class SubstitutionResponseFilter implements Filter {
 
     final String SUBSTITUTION_RESPONSE_REPLACEMENT = "response.substitute.replacement";
 
-    String types;
+    Map<String, String> types = new HashMap<>();
 
-    String term;
+    Map<String, String> terms = new HashMap<>();
 
-    String replacement;
+    Map<String, String> replacements = new HashMap<>();
 
-    String host;
+    Map<String, String> hosts = new HashMap<>();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        host = Optional.ofNullable(filterConfig.getInitParameter("filter-host")).orElse(getValue(
-                SUBSTITUTION_RESPONSE_HOST));
+        extract(props(), SUBSTITUTION_RESPONSE_HOST)
+                .entrySet().stream().forEach(e -> hosts.put(e.getValue(), e.getKey()));
 
-        types = Optional.ofNullable(filterConfig.getInitParameter("content-types"))
-                .orElse(Optional.ofNullable(getValue(SUBSTITUTION_RESPONSE_TYPES))
-                        .orElse(""));
-        term = Optional.ofNullable(filterConfig.getInitParameter("term")).orElse(getValue(
-                SUBSTITUTION_RESPONSE_TERM));
-        replacement = Optional.ofNullable(filterConfig.getInitParameter("replacement")).orElse(getValue(
-                SUBSTITUTION_RESPONSE_REPLACEMENT));
+        terms = extract(props(), SUBSTITUTION_RESPONSE_TERM);
+        replacements = extract(props(), SUBSTITUTION_RESPONSE_REPLACEMENT);
+        types = extract(props(), SUBSTITUTION_RESPONSE_TYPES);
 
-        if (term != null) {
-            LOG.info("Searching for term {}", term);
-
-            if (replacement != null) {
-                LOG.info("Replacing with {}", replacement);
-            }
-        }
-
-        if (host != null) {
-            LOG.info("Applying substitutions only from host " + host);
-        }
+        hosts.entrySet().forEach(host -> LOG.info("{}: Replacing {} with {}",
+                host.getKey(),
+                terms.get(host.getValue()),
+                replacements.get(host.getValue())));
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
 
-        if (term == null || host != null && !host.equals(((HttpServletRequest) request).getHeader("host"))) {
-            LOG.debug("Not filtering response");
+        final String host = ((HttpServletRequest) request).getHeader("host");
+        final String key = hosts.get(host);
+
+        if (!hosts.containsKey(host) || terms.get(key) == null) {
             chain.doFilter(request, response);
-        } else {
-            LOG.debug("Filtering response");
-            chain.doFilter(request, new BodyReplacingFilter((HttpServletResponse) response));
+            return;
         }
+
+        chain.doFilter(request, new BodyReplacingFilter((HttpServletResponse) response, body -> body.replace(terms
+                .get(key), replacements.get(key)), types.get(key)));
     }
 
     @Override
@@ -118,11 +114,18 @@ public class SubstitutionResponseFilter implements Filter {
 
         boolean enableReplacement = false;
 
+        final Function<String, String> transform;
+
+        final String mediaTypes;
+
         /**
          * @param response
          */
-        public BodyReplacingFilter(HttpServletResponse response) {
+        public BodyReplacingFilter(HttpServletResponse response, Function<String, String> transform,
+                String mediaTypes) {
             super(response);
+            this.transform = transform;
+            this.mediaTypes = Optional.ofNullable(mediaTypes).orElse("");
         }
 
         @SuppressWarnings("resource")
@@ -131,7 +134,7 @@ public class SubstitutionResponseFilter implements Filter {
 
             final ServletOutputStream delegate = super.getOutputStream();
             if (outputWrapper == null) {
-                outputWrapper = new ReplacingOutputStream(delegate);
+                outputWrapper = new ReplacingOutputStream(delegate, transform);
             }
 
             return new ServletOutputStream() {
@@ -194,7 +197,7 @@ public class SubstitutionResponseFilter implements Filter {
         @Override
         public void addHeader(String name, String value) {
             super.addHeader(name, value);
-            if (name.equalsIgnoreCase("content-type") && (types.equals("") || types.contains(value))) {
+            if (name.equalsIgnoreCase("content-type") && (mediaTypes.equals("") || mediaTypes.contains(value))) {
                 enableReplacement = true;
             }
         }
@@ -202,14 +205,14 @@ public class SubstitutionResponseFilter implements Filter {
         @Override
         public void setHeader(String name, String value) {
             super.addHeader(name, value);
-            if (name.equalsIgnoreCase("content-type") && (types.equals("") || types.contains(value))) {
+            if (name.equalsIgnoreCase("content-type") && (mediaTypes.equals("") || mediaTypes.contains(value))) {
                 enableReplacement = true;
             }
         }
 
         @Override
         public void setContentType(String type) {
-            if (types.equals("") || types.contains(type)) {
+            if (mediaTypes.equals("") || mediaTypes.contains(type)) {
                 enableReplacement = true;
                 super.setContentType(type);
             }
@@ -220,12 +223,15 @@ public class SubstitutionResponseFilter implements Filter {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
+        final Function<String, String> transform;
+
         public void reset() {
             out = new ByteArrayOutputStream();
         }
 
-        public ReplacingOutputStream(OutputStream out) {
+        public ReplacingOutputStream(OutputStream out, Function<String, String> transform) {
             super(out);
+            this.transform = transform;
         }
 
         @Override
@@ -235,7 +241,7 @@ public class SubstitutionResponseFilter implements Filter {
 
         @Override
         public void flush() throws IOException {
-            super.out.write(new String(out.toByteArray(), UTF_8).replace(term, replacement).getBytes(UTF_8));
+            super.out.write(transform.apply((new String(out.toByteArray(), UTF_8))).getBytes(UTF_8));
             super.out.flush();
             reset();
         }

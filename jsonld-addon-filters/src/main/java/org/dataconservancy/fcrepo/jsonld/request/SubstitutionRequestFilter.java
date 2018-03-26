@@ -17,12 +17,14 @@
 package org.dataconservancy.fcrepo.jsonld.request;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.getValue;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.extract;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.props;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -61,56 +63,45 @@ public class SubstitutionRequestFilter implements Filter {
 
     static final String SUBSTITUTION_REQUEST_REPLACEMENT = "request.substitute.replacement";
 
-    String term;
+    Map<String, String> terms = new HashMap<>();
 
-    String replacement;
+    Map<String, String> replacements = new HashMap<>();
 
-    String host;
+    Map<String, String> hosts = new HashMap<>();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
         LOG.info("Initializing substitution filter");
 
-        host = Optional.ofNullable(filterConfig.getInitParameter("filter-host")).orElse(getValue(
-                SUBSTITUTION_REQUEST_HOST));
+        extract(props(), SUBSTITUTION_REQUEST_HOST)
+                .entrySet().stream().forEach(e -> hosts.put(e.getValue(), e.getKey()));
 
-        term = Optional.ofNullable(filterConfig.getInitParameter("term")).orElse(getValue(
-                SUBSTITUTION_REQUEST_TERM));
-        replacement = Optional.ofNullable(filterConfig.getInitParameter("replacement")).orElse(getValue(
-                SUBSTITUTION_REQUEST_REPLACEMENT));
+        terms = extract(props(), SUBSTITUTION_REQUEST_TERM);
+        replacements = extract(props(), SUBSTITUTION_REQUEST_REPLACEMENT);
 
-        if (term != null) {
-            LOG.info("Searching for term {}", term);
-
-            if (replacement != null) {
-                LOG.info("Replacing with {}", replacement);
-            }
-        }
-
-        if (host != null) {
-            LOG.info("Applying substitutions only from host " + host);
-        }
-
+        hosts.entrySet().forEach(host -> LOG.info("{}: Replacing {} with {}",
+                host.getKey(),
+                terms.get(host.getValue()),
+                replacements.get(host.getValue())));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
 
         LOG.debug("Do filter");
 
-        if (term == null || host != null && !host.equals(((HttpServletRequest) request).getHeader("host"))) {
-            LOG.debug("Skipping processing.  Term: {}, host: {}, desired host: {}", term, host,
-                    ((HttpServletRequest) request).getHeader("host"));
+        final String host = ((HttpServletRequest) request).getHeader("host");
+        final String key = hosts.get(host);
+
+        if (!hosts.containsKey(host) || terms.get(key) == null) {
             chain.doFilter(request, response);
             return;
         }
 
-        final HttpServletRequest req = new ParamReplacingWrapper((HttpServletRequest) request);
+        final HttpServletRequest req = new ParamReplacingWrapper((HttpServletRequest) request, param -> param.replace(
+                terms.get(key), replacements.get(key)));
 
         final String method = req.getMethod();
 
@@ -121,25 +112,21 @@ public class SubstitutionRequestFilter implements Filter {
             LOG.debug("POST urlencoded");
             chain.doFilter(new BodyReplacingWrapper(
                     req,
-                    body -> encode(decode(body).replace(term, replacement))), response);
+                    body -> encode(decode(body).replace(terms.get(key), replacements.get(key)))), response);
         } else if ("POST".equals(method)) {
             LOG.debug("POST no urlencode");
             chain.doFilter(new BodyReplacingWrapper(
                     req,
-                    body -> body.replace(term, replacement)), response);
+                    body -> body.replace(terms.get(key), replacements.get(key))), response);
         } else {
             LOG.debug("Nothing, method: " + method);
             chain.doFilter(req, response);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void destroy() {
-        // TODO Auto-generated method stub
-
+        // Nothing
     }
 
     private static String encode(String content) {
@@ -216,18 +203,21 @@ public class SubstitutionRequestFilter implements Filter {
 
     private class ParamReplacingWrapper extends HttpServletRequestWrapper {
 
+        final Function<String, String> repl;
+
         /**
          * @param request
          */
-        public ParamReplacingWrapper(HttpServletRequest request) {
+        public ParamReplacingWrapper(HttpServletRequest request, Function<String, String> repl) {
             super(request);
+            this.repl = repl;
         }
 
         @Override
         public String getParameter(String paramName) {
             final String value = super.getParameter(paramName);
             if (value != null) {
-                return value.replace(term, replacement);
+                return repl.apply(value);
             }
             return value;
         }
@@ -238,7 +228,7 @@ public class SubstitutionRequestFilter implements Filter {
             if (values != null) {
                 for (int index = 0; index < values.length; index++) {
                     if (values[index] != null) {
-                        values[index] = values[index].replace(term, replacement);
+                        values[index] = repl.apply(values[index]);
                     }
                 }
             }
@@ -252,7 +242,7 @@ public class SubstitutionRequestFilter implements Filter {
                 for (final String[] values : paramMap.values()) {
                     for (int index = 0; index < values.length; index++) {
                         if (values[index] != null) {
-                            values[index] = values[index].replace(term, replacement);
+                            values[index] = repl.apply(values[index]);
                         }
                     }
                 }

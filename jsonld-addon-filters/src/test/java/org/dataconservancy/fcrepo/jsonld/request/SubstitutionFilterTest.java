@@ -18,6 +18,7 @@ package org.dataconservancy.fcrepo.jsonld.request;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.io.IOUtils.toInputStream;
+import static org.dataconservancy.fcrepo.jsonld.request.SubstitutionRequestFilter.SUBSTITUTION_REQUEST_HOST;
 import static org.dataconservancy.fcrepo.jsonld.request.SubstitutionRequestFilter.SUBSTITUTION_REQUEST_REPLACEMENT;
 import static org.dataconservancy.fcrepo.jsonld.request.SubstitutionRequestFilter.SUBSTITUTION_REQUEST_TERM;
 import static org.junit.Assert.assertEquals;
@@ -47,9 +48,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 /**
  * @author apb@jhu.edu
  */
-@SuppressWarnings("resource")
 @RunWith(MockitoJUnitRunner.class)
 public class SubstitutionFilterTest {
+
+    static final String HOST = "myHost";
 
     @Mock
     FilterChain chain;
@@ -73,8 +75,10 @@ public class SubstitutionFilterTest {
 
         System.setProperty(SUBSTITUTION_REQUEST_TERM, "no match");
         System.setProperty(SUBSTITUTION_REQUEST_REPLACEMENT, "blah");
+        System.setProperty(SUBSTITUTION_REQUEST_HOST, HOST);
 
         when(request.getMethod()).thenReturn("POST");
+        when(request.getHeader("host")).thenReturn(HOST);
         when(request.getInputStream()).thenReturn(servletStream(toInputStream(INPUT, UTF_8)));
 
         final SubstitutionRequestFilter toTest = new SubstitutionRequestFilter();
@@ -94,8 +98,10 @@ public class SubstitutionFilterTest {
 
         System.setProperty(SUBSTITUTION_REQUEST_TERM, "no match");
         System.setProperty(SUBSTITUTION_REQUEST_REPLACEMENT, "blah");
+        System.setProperty(SUBSTITUTION_REQUEST_HOST, HOST);
 
         when(request.getMethod()).thenReturn("POST");
+        when(request.getHeader("host")).thenReturn(HOST);
         when(request.getContentType()).thenReturn("application/x-www-form-urlencoded");
         when(request.getInputStream()).thenReturn(servletStream(toInputStream(INPUT, UTF_8)));
 
@@ -117,8 +123,10 @@ public class SubstitutionFilterTest {
 
         System.setProperty(SUBSTITUTION_REQUEST_TERM, "input");
         System.setProperty(SUBSTITUTION_REQUEST_REPLACEMENT, "awesome");
+        System.setProperty(SUBSTITUTION_REQUEST_HOST, HOST);
 
         when(request.getMethod()).thenReturn("POST");
+        when(request.getHeader("host")).thenReturn(HOST);
         when(request.getInputStream()).thenReturn(servletStream(toInputStream(INPUT, UTF_8)));
 
         final SubstitutionRequestFilter toTest = new SubstitutionRequestFilter();
@@ -139,8 +147,10 @@ public class SubstitutionFilterTest {
 
         System.setProperty(SUBSTITUTION_REQUEST_TERM, "is/input");
         System.setProperty(SUBSTITUTION_REQUEST_REPLACEMENT, "is excellent/awesome");
+        System.setProperty(SUBSTITUTION_REQUEST_HOST, HOST);
 
         when(request.getMethod()).thenReturn("POST");
+        when(request.getHeader("host")).thenReturn(HOST);
         when(request.getContentType()).thenReturn("application/x-www-form-urlencoded");
         when(request.getInputStream()).thenReturn(servletStream(toInputStream(INPUT, UTF_8)));
 

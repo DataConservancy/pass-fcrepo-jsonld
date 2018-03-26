@@ -68,17 +68,22 @@ public class ConfigUtilTest {
         final String PREFIX = "my.prefix";
         final String KEY1 = "key1";
         final String KEY2 = "key2";
+        final String KEY3 = "";
         final String VALUE1 = "myValue1";
         final String VALUE2 = "myValue2";
+        final String VALUE3 = "myValue3";
         System.setProperty(join(".", PREFIX, KEY1), VALUE1);
         System.setProperty(join(".", PREFIX, KEY2), VALUE2);
+        System.setProperty(PREFIX, VALUE3);
+
         System.setProperty("does.not.match", "bogus");
 
         final Map<String, String> extracted = extract(props(), PREFIX);
 
-        assertEquals(2, extracted.size());
+        assertEquals(3, extracted.size());
         assertEquals(VALUE1, extracted.get(KEY1));
         assertEquals(VALUE2, extracted.get(KEY2));
+        assertEquals(VALUE3, extracted.get(KEY3));
 
     }
 
