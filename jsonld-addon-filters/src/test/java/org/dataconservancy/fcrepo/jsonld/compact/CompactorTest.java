@@ -33,7 +33,7 @@ import com.github.jsonldjava.core.JsonLdOptions;
 public class CompactorTest {
 
     @Test
-    public void compactorTest() throws Exception {
+    public void compactJsonldTest() throws Exception {
 
         final URL CONTEXT_URL = new URL("http://example.org/compactorTest/farm.jsonld");
 

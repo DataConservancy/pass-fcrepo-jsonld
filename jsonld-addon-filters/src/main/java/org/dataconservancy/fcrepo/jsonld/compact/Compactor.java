@@ -20,10 +20,14 @@ import static com.github.jsonldjava.utils.JsonUtils.fromString;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.github.jsonldjava.core.JsonLdApi;
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
+import com.github.jsonldjava.core.RDFDataset;
 import com.github.jsonldjava.utils.JsonUtils;
 
 /**
@@ -53,6 +57,18 @@ class Compactor {
                     JsonLdProcessor.compact(fromString(jsonld), getContext(context), options));
         } catch (final JsonLdError | IOException ex) {
             throw new RuntimeException("Error converting JsonLd", ex);
+        }
+    }
+
+    public String compact(RDFDataset rdf, URL context) {
+        try {
+            final Map<String, Object> cxt = new HashMap<>();
+            cxt.put("@context", context.toString());
+
+            return JsonUtils.toPrettyString(
+                    JsonLdProcessor.compact(new JsonLdApi(options).fromRDF(rdf), getContext(context), options));
+        } catch (JsonLdError | IOException ex) {
+            throw new RuntimeException("Error converting jsonld", ex);
         }
     }
 

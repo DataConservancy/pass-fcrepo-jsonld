@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.fcrepo.jsonld.deserialize;
+package org.dataconservancy.fcrepo.jsonld;
 
 import static com.github.jsonldjava.utils.JsonUtils.fromString;
 

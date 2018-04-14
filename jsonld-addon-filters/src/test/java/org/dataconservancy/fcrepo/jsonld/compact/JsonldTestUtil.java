@@ -25,6 +25,8 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
+import org.unitils.reflectionassert.ReflectionAssert;
+import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 /**
  * @author apb@jhu.edu
@@ -43,8 +45,10 @@ public class JsonldTestUtil {
     }
 
     public static boolean isCompact(String jsonld) {
-        final Map<String, Object> testJson = new JSONObject(jsonld).toMap();
-        return testJson.equals(compacted);
+        final Map<String, Object> testJson = redact(new JSONObject(jsonld).toMap());
+
+        ReflectionAssert.assertReflectionEquals(compacted, testJson, ReflectionComparatorMode.LENIENT_ORDER);
+        return true;
     }
 
     public static String getContextFileLocation() {
@@ -57,10 +61,15 @@ public class JsonldTestUtil {
 
     private static Map<String, Object> getCompacted() {
         try {
-            return new JSONObject(IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
-                    "/compact.json"), UTF_8)).toMap();
+            return redact(new JSONObject(IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
+                    "/compact.json"), UTF_8)).toMap());
         } catch (final IOException e) {
             throw new RuntimeException("Could not read compacted JSON-LD");
         }
+    }
+
+    private static Map<String, Object> redact(Map<String, Object> input) {
+        input.remove("@context");
+        return input;
     }
 }

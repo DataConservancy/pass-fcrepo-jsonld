@@ -18,13 +18,12 @@ package org.dataconservancy.fcrepo.jsonld.compact;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.addStaticContext;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
 import static org.junit.Assert.assertTrue;
 
 import java.io.StringReader;
 import java.net.URL;
 
-import org.dataconservancy.fcrepo.jsonld.deserialize.JsonldNtriplesTranslator;
+import org.dataconservancy.fcrepo.jsonld.JsonldNtriplesTranslator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
@@ -49,24 +48,6 @@ public class JsonldNtriplesTranslatorTest {
 
         addStaticContext(CONTEXT_URL, JsonldNtriplesTranslatorTest.class.getResourceAsStream("/context.jsonld"),
                 options);
-    }
-
-    /* Basic json-ld with embedded context */
-    @Test
-    public void embeddedContextTest() throws Exception {
-
-        final JsonldNtriplesTranslator t = new JsonldNtriplesTranslator();
-        t.setOptions(options);
-
-        final String JSON = getUncompactedJsonld();
-
-        final Model desiredTriples = ModelFactory.createDefaultModel();
-        desiredTriples.read(this.getClass().getResourceAsStream("/file.nt"), null, "N-Triples");
-
-        final Model actualTriples = ModelFactory.createDefaultModel();
-        actualTriples.read(new StringReader(t.translate(JSON)), null, "N-Triples");
-
-        assertTrue(desiredTriples.isIsomorphicWith(actualTriples));
     }
 
     /* Verifies that the null relative URI is OK */
