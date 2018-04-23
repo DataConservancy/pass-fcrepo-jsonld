@@ -1,19 +1,25 @@
 language: java
 sudo: true
 script:
-  - sudo service mysql stop
-  - sudo service postgresql stop
-  - sudo service acpid stop
-  - sudo service atd stop
-  - sudo service cron stop
-  - sudo service memcached stop
-  - sudo service ntp stop
-  - sudo service rabbitmq-server stop
-  - sudo service resolvconf stop
-  - sudo service sshguard stop
-  - sudo service ssh stop
-  - mvn clean install
+- sudo service mysql stop
+- sudo service postgresql stop
+- sudo service acpid stop
+- sudo service atd stop
+- sudo service cron stop
+- sudo service memcached stop
+- sudo service ntp stop
+- sudo service rabbitmq-server stop
+- sudo service resolvconf stop
+- sudo service sshguard stop
+- sudo service ssh stop
+- mvn clean install
 jdk:
 - oraclejdk8
 after_failure:
 - cat jsonld-addon-integration/target/failsafe-reports/*.txt
+after_success:
+- if [ "$TRAVIS_BRANCH" == "master" ]; then mvn deploy --settings settings.xml -DskipTests=true -B; fi
+env:
+  global:
+  - secure: oUczPXsgDeASS2KzbD3KwH1svKJcx1rY1RQx7+7NGy53awpG6TI11kUVrLBr0YdAbpx34rSbye5AQbNLEUpH0iRvTeSB9f0abYvdXkDovyzggUEccHcjp1b+zeQayu+phI2hHXGAbFZZZibzntrGM0OUX/Xq0wZmQyfc7bkZG6sgYoQ7pqI9PR0/Gz/qO8hkM5J+qGGLqfU7lBtjKYDLKt7YwMJAp+Een2ISMhs33MgoWZjVDZiRTA0/lUnkj4j56IAt6yvFzlHp1F/CrbugXKSJHg5qKywXa78pemkaHB1pxaGgU9LBmmZIl6m5b1VfmVQcjiBWbTPE0xUuQSv/FqfjCtHCNMUUzBH6kX8NFNuCKBmUv7CZZlzSyDc4pCtLzTM3jnkb8WsnICmO+6EqTjnnRguYhTNnyEFLOJHVbeiH0m34p7mQgLDdoEk6KlgTmEvZZ7Qxx23mqLiGKkA3wamW333iMF911uTKp8C8iRy/5Wy8zOR3d96WfTTiMaeBsTIYk+CyT4BpXBrkhe+wp2wclCR3HWoQJ1M2lF/z8SB//8spFECIolSAvxfoGFX8XZgy0XsCGSPBblBeA8uMhej4ohu+AFMfYBf4rlAocI6cEntSulpt8DgkMGu4ZDHCHuJ6Oh3ic+H8QcCf3PUv/2ucN2QrlVwQf0ZYUC7T2mE=
+  - secure: p+ELpeDbsxC/u6yN94bEsd95rH63zhL/Az15DmKIspHQwKCGzK1ff4bJFbyLX7nQLVJubboiztm4J2lbImGsFXhdRUQhTd9P4XP+j9Vg+e8jjVzC7Zl1tUE3hnyjhbnFcLeQK4HQwH7eicIysNlZDO5QiwZEgmoVOcSwTab8ICcYdbo0wlrFDdNhKxuWtGmQiC9S1Rxrv/yLgU88Ka+ByDwTOiH0wH7Ni+SOxTq1PJteV5NZgLAEICsvaYN7Ck+rJ1IC2pvUJePANdOZdeHjV5w+VUewm4llKlpORlUUsaGmFZnY/oeI0VKj4rPRLv/KhAQp747OlXbmFCRwK+yuknUbda0SJwRkYgngtOrHVvguKOlUrIOoqUQHIgkEyDDpYi5o0h/h1gsn1u9gjm6uwMRlQRprT2ryy+05Qpq/lzUdQEM+nAsSPm6u4iyPSHbVUuWTnE0/PpppniB3gLtvo416J/yo07qhC3I0ipYLBwND29CwogZxv7nFe0tewLNKcS9Bmj9xSBudSFzSNcQnYgh6kntip7JCMkw0le+DnVQPquRCPsNPqLakOiiHR/86WayHMn6w5WMWoRi7svdHf4fTAWqxV/SwaQnS9SqWc6zLrMhA0BkGr2GqFE5i+65R8XE6C0+CKKxjDEuQzMt1wpPHi8ikimTXPYpNs5jeZiA=
