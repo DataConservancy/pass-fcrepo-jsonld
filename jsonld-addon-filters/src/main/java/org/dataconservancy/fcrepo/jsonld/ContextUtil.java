@@ -16,12 +16,18 @@
 
 package org.dataconservancy.fcrepo.jsonld;
 
+import static com.github.jsonldjava.utils.JsonUtils.fromString;
+
 import java.io.IOException;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.github.jsonldjava.core.Context;
+import com.github.jsonldjava.core.JsonLdOptions;
 
 /**
  * @author apb@jhu.edu
@@ -41,6 +47,29 @@ public class ContextUtil {
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Context getContext(ObjectNode node, JsonLdOptions options) throws BadRequestException {
+        final JsonNode contextNode = node.get("@context");
+
+        final Object rawContext;
+        if (contextNode.isTextual()) {
+            rawContext = options.getDocumentLoader()
+                    .loadDocument(contextNode.asText())
+                    .getDocument();
+        } else {
+            final JsonNode inlineContext = mapper.createObjectNode().set("@context", contextNode);
+            try {
+                rawContext = fromString(mapper.writeValueAsString(inlineContext));
+            } catch (final IOException e) {
+                throw new BadRequestException("Error paarsing inline context", e);
+            }
+        }
+
+        final Context cxt = new Context(options);
+        return cxt.parse(((Map<String, Object>) rawContext).get("@context"));
+
     }
 
     public static ContextReady replaceContextFrom(String json) throws Exception {

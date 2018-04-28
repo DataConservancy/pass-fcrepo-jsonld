@@ -44,11 +44,10 @@ public class JsonldTestUtil {
         }
     }
 
-    public static boolean isCompact(String jsonld) {
+    public static void assertCompact(String jsonld) {
         final Map<String, Object> testJson = redact(new JSONObject(jsonld).toMap());
 
         ReflectionAssert.assertReflectionEquals(compacted, testJson, ReflectionComparatorMode.LENIENT_ORDER);
-        return true;
     }
 
     public static String getContextFileLocation() {
@@ -70,6 +69,8 @@ public class JsonldTestUtil {
 
     private static Map<String, Object> redact(Map<String, Object> input) {
         input.remove("@context");
+        input.remove("@id");
+        input.remove("id");
         return input;
     }
 }

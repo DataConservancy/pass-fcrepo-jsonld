@@ -17,9 +17,8 @@
 package org.dataconservancy.fcrepo.jsonld.compact;
 
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.addStaticContext;
+import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.isCompact;
-import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
 
@@ -46,6 +45,6 @@ public class CompactorTest {
 
         final String JSON = getUncompactedJsonld();
 
-        assertTrue(isCompact(compactor.compact(JSON, CONTEXT_URL)));
+        assertCompact(compactor.compact(JSON, CONTEXT_URL));
     }
 }

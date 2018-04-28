@@ -43,6 +43,8 @@ class DeserializationWrapper extends HttpServletRequestWrapper {
 
     private final ServletInputStream originalInputStream;
 
+    final ByteArrayInputStream translatedOutputStream;
+
     private final JsonldNtriplesTranslator transltor;
 
     private static final Logger LOG = LoggerFactory.getLogger(DeserializationWrapper.class);
@@ -55,6 +57,18 @@ class DeserializationWrapper extends HttpServletRequestWrapper {
         try {
             this.originalInputStream = request.getInputStream();
             this.transltor = translator;
+
+            try (InputStream in = originalInputStream) {
+
+                final String originalBody = IOUtils.toString(
+                        originalInputStream, UTF_8);
+                LOG.debug("Original content: " + originalBody);
+
+                final String translatedBody = transltor.translate(originalBody);
+                LOG.debug("Translated content: " + translatedBody);
+                translatedOutputStream = new ByteArrayInputStream(translatedBody.getBytes(UTF_8));
+
+            }
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -65,33 +79,9 @@ class DeserializationWrapper extends HttpServletRequestWrapper {
 
         return new ServletInputStream() {
 
-            final ByteArrayInputStream translatedOutputStream;
-
-            boolean finished = false;
-
-            {
-                try (InputStream in = originalInputStream) {
-
-                    final String originalBody = IOUtils.toString(
-                            originalInputStream, UTF_8);
-                    LOG.debug("Original content: " + originalBody);
-
-                    final String translatedBody = transltor.translate(originalBody);
-                    LOG.debug("Translated content: " + translatedBody);
-                    translatedOutputStream = new ByteArrayInputStream(translatedBody.getBytes(UTF_8));
-
-                } catch (final IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
             @Override
             public int read() throws IOException {
-                final int byt = translatedOutputStream.read();
-                if (byt == -1) {
-                    finished = true;
-                }
-                return byt;
+                return translatedOutputStream.read();
             }
 
             @Override
@@ -106,12 +96,7 @@ class DeserializationWrapper extends HttpServletRequestWrapper {
 
             @Override
             public boolean isFinished() {
-                return finished;
-            }
-
-            @Override
-            public void close() throws IOException {
-                translatedOutputStream.close();
+                return !(translatedOutputStream.available() > 0);
             }
         };
     }

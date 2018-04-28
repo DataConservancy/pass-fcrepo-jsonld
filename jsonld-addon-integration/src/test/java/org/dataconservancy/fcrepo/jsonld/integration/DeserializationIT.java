@@ -18,8 +18,7 @@ package org.dataconservancy.fcrepo.jsonld.integration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.isCompact;
-import static org.junit.Assert.assertTrue;
+import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -64,7 +63,7 @@ public class DeserializationIT {
 
             final String body = IOUtils.toString(response.getBody(), UTF_8);
 
-            assertTrue(body, isCompact(body));
+            assertCompact(body);
         }
 
     }

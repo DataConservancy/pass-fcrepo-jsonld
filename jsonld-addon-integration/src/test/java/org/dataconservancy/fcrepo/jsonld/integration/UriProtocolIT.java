@@ -17,7 +17,6 @@
 package org.dataconservancy.fcrepo.jsonld.integration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -100,7 +99,7 @@ public class UriProtocolIT implements FcrepoIT {
 
             final HttpPost post = new HttpPost(fcrepoBaseURI);
             post.setEntity(EntityBuilder.create()
-                    .setBinary(getUncompactedJsonld().getBytes(UTF_8))
+                    .setBinary(IOUtils.toByteArray(this.getClass().getResourceAsStream("/compact-uri.json")))
                     .setContentType(ContentType.create("application/ld+json"))
                     .build());
 

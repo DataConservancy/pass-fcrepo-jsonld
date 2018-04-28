@@ -1,7 +1,7 @@
 {
     "@context": "http://example.org/farm",
-    "id": "",
-    "type": "Cow",
+    "@id": "",
+    "@type": "Cow",
     "birthDate": "1980-12-01T00:00:00.000Z",
     "healthy": false,
     "milkVolume": 30.5,

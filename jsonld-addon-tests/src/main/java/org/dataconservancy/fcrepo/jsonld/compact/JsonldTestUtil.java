@@ -21,11 +21,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
+import org.unitils.reflectionassert.ReflectionAssert;
+import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 /**
  * @author apb@jhu.edu
@@ -43,9 +44,10 @@ public class JsonldTestUtil {
         }
     }
 
-    public static boolean isCompact(String jsonld) {
-        final Map<String, Object> testJson = new JSONObject(jsonld).toMap();
-        return redacted(testJson).equals(redacted(compacted));
+    public static void assertCompact(String jsonld) {
+        final Map<String, Object> testJson = redact(new JSONObject(jsonld).toMap());
+
+        ReflectionAssert.assertReflectionEquals(compacted, testJson, ReflectionComparatorMode.LENIENT_ORDER);
     }
 
     public static String getContextFileLocation() {
@@ -58,26 +60,17 @@ public class JsonldTestUtil {
 
     private static Map<String, Object> getCompacted() {
         try {
-            final Map<String, Object> result = new JSONObject(IOUtils.toString(JsonldTestUtil.class
-                    .getResourceAsStream(
-                            "/compact.json"), UTF_8)).toMap();
-            return result;
+            return redact(new JSONObject(IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
+                    "/compact.json"), UTF_8)).toMap());
         } catch (final IOException e) {
             throw new RuntimeException("Could not read compacted JSON-LD");
         }
     }
 
-    private static Map<String, Object> redacted(Map<String, Object> obj) {
-        final Map<String, Object> redacted = new HashMap<>(obj);
-        if (redacted.containsKey("id")) {
-            redacted.put("id", "");
-        }
-
-        if (redacted.containsKey("@id")) {
-            redacted.put("@id", "");
-        }
-
-        return redacted;
-
+    private static Map<String, Object> redact(Map<String, Object> input) {
+        input.remove("@context");
+        input.remove("@id");
+        input.remove("id");
+        return input;
     }
 }

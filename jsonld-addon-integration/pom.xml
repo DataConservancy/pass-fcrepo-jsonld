@@ -101,6 +101,7 @@
               <compaction.uri>${compaction.uri}</compaction.uri>
               <compaction.preload.uri.farm>${compaction.preload.uri.farm}</compaction.preload.uri.farm>
               <compaction.preload.file.farm>${compaction.preload.file.farm}</compaction.preload.file.farm>
+              <strict.jsonld>true</strict.jsonld>
               <fcrepo.home>${project.build.directory}/fcrepo</fcrepo.home>
               <fcrepo.modeshape.configuration>classpath:/config/file-simple/repository.json</fcrepo.modeshape.configuration>
               <fcrepo.dynamic.jms.port>${fcrepo.dynamic.jms.port}</fcrepo.dynamic.jms.port>
@@ -162,63 +163,6 @@
           </execution>
         </executions>
       </plugin>
-
-      <plugin>
-        <groupId>io.fabric8</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <version>0.24.0</version>
-        <configuration>
-          <images>
-            <image>
-              <alias>fcrepo</alias>
-              <run>
-                <wait>
-                  <http>
-                    <url>http://localhost:${FUSEKI_PORT}/fuseki</url>
-                  </http>
-                  <time>60000</time>
-                </wait>
-              </run>
-              <external>
-                <type>compose</type>
-                <basedir>target/test-classes/docker</basedir>
-                <composeFile>docker-compose.yml</composeFile>
-              </external>
-            </image>
-          </images>
-        </configuration>
-        <executions>
-          <execution>
-            <id>start-docker-its</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>start</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>stop-docker-its</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>stop</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>default-cli</id>
-            <configuration>
-              <images>
-                <image>
-                  <external>
-                    <type>compose</type>
-                    <basedir>src/test/resources/docker</basedir>
-                    <composeFile>docker-compose.yml</composeFile>
-                  </external>
-                </image>
-              </images>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
     </plugins>
 
   </build>
@@ -230,18 +174,21 @@
       <artifactId>jsonld-addon-filters</artifactId>
       <version>${project.version}</version>
       <classifier>shaded</classifier>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.25</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
       <version>1.7.25</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -284,6 +231,13 @@
       <groupId>org.dataconservancy.fcrepo</groupId>
       <artifactId>jsonld-addon-tests</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.unitils</groupId>
+      <artifactId>unitils-core</artifactId>
+      <version>3.4.6</version>
       <scope>test</scope>
     </dependency>
 

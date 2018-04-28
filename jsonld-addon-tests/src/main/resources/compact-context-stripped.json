@@ -1,6 +1,6 @@
 {
-  "id" : "http://localhost:8080/rest/farm/kine/eb/5f/90/ff/eb5f90ff-80bb-4c3f-851b-086c4e85c0d8",
-  "type" : "Cow",
+  "@id" : "http://localhost:8080/rest/farm/kine/eb/5f/90/ff/eb5f90ff-80bb-4c3f-851b-086c4e85c0d8",
+  "@type" : "Cow",
   "birthDate" : "1980-12-01T00:00:00.000Z",
   "healthy" : false,
   "milkVolume" : 30.5,

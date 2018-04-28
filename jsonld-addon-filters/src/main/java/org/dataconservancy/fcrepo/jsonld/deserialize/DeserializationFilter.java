@@ -16,9 +16,12 @@
 
 package org.dataconservancy.fcrepo.jsonld.deserialize;
 
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.STRICT_JSONLD;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.getValue;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.loadContexts;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Optional;
 
 import javax.servlet.Filter;
@@ -28,7 +31,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.dataconservancy.fcrepo.jsonld.BadRequestException;
 import org.dataconservancy.fcrepo.jsonld.JsonldNtriplesTranslator;
 
 import org.slf4j.Logger;
@@ -53,16 +58,18 @@ public class DeserializationFilter implements Filter {
 
         loadContexts(options);
 
-        translator = new JsonldNtriplesTranslator();
-        translator.setOptions(options);
+        boolean strict = false;
+        if (getValue(STRICT_JSONLD) != null && !getValue(STRICT_JSONLD).equals("false")) {
+            strict = true;
+        }
+        translator = new JsonldNtriplesTranslator(options, strict);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
+
+        final HttpServletResponse resp = (HttpServletResponse) response;
 
         LOG.debug("Deserialization filter considering the request");
 
@@ -73,8 +80,16 @@ public class DeserializationFilter implements Filter {
 
         if (("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method)) &&
                 contentType.contains("application/ld+json")) {
-            LOG.debug("Deserialization filter is deserializing JSON-LD");
-            chain.doFilter(new DeserializationWrapper((HttpServletRequest) request, translator), response);
+            try {
+                LOG.debug("Deserialization filter is deserializing JSON-LD");
+                chain.doFilter(new DeserializationWrapper((HttpServletRequest) request, translator), response);
+            } catch (final BadRequestException e) {
+                resp.setStatus(400);
+                try (Writer out = resp.getWriter()) {
+                    out.write(e.getMessage());
+                }
+                LOG.warn("Bad request", e);
+            }
         } else {
             LOG.debug("Deserialization filter is doing nothing: " + method + ", " + contentType);
             chain.doFilter(request, response);

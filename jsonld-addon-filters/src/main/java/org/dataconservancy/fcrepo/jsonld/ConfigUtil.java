@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ConfigUtil {
 
+    public static final String STRICT_JSONLD = "strict.jsonld";
+
     static final Logger LOG = LoggerFactory.getLogger(ConfigUtil.class);
 
     /**

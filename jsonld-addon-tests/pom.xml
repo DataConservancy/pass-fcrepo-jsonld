@@ -9,7 +9,7 @@
   <artifactId>jsonld-addon-tests</artifactId>
 
   <dependencies>
-  
+
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -19,6 +19,12 @@
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20180130</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.unitils</groupId>
+      <artifactId>unitils-core</artifactId>
+      <version>3.4.6</version>
     </dependency>
   </dependencies>
 </project>

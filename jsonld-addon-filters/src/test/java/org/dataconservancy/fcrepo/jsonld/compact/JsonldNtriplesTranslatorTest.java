@@ -19,10 +19,12 @@ package org.dataconservancy.fcrepo.jsonld.compact;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.addStaticContext;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.StringReader;
 import java.net.URL;
 
+import org.dataconservancy.fcrepo.jsonld.BadRequestException;
 import org.dataconservancy.fcrepo.jsonld.JsonldNtriplesTranslator;
 
 import org.apache.commons.io.IOUtils;
@@ -54,8 +56,7 @@ public class JsonldNtriplesTranslatorTest {
     @Test
     public void nullRelativeIdTest() throws Exception {
 
-        final JsonldNtriplesTranslator t = new JsonldNtriplesTranslator();
-        t.setOptions(options);
+        final JsonldNtriplesTranslator t = new JsonldNtriplesTranslator(options, false);
 
         final String JSON = IOUtils.toString(this.getClass().getResourceAsStream("/null-relative.json"), UTF_8);
 
@@ -73,8 +74,7 @@ public class JsonldNtriplesTranslatorTest {
     @Test
     public void linkedContextTest() throws Exception {
 
-        final JsonldNtriplesTranslator t = new JsonldNtriplesTranslator();
-        t.setOptions(options);
+        final JsonldNtriplesTranslator t = new JsonldNtriplesTranslator(options, false);
 
         final String JSON = IOUtils.toString(this.getClass().getResourceAsStream("/uri-context.json"), UTF_8);
 
@@ -83,5 +83,31 @@ public class JsonldNtriplesTranslatorTest {
 
         final Model actualTriples = ModelFactory.createDefaultModel();
         actualTriples.read(new StringReader(t.translate(JSON)), null, "N-Triples");
+    }
+
+    @Test
+    public void validationTest() throws Exception {
+        final JsonldNtriplesTranslator validating = new JsonldNtriplesTranslator(options, true);
+        final JsonldNtriplesTranslator nonValidating = new JsonldNtriplesTranslator(options, false);
+
+        final String unexpected = "{ " +
+                "\"@id\": \"test:123\", " +
+                "\"@type\": \"Cow\", " +
+                "\"unexpectedProperty\": true, " +
+                "\"milkVolume\": 100.6, " +
+                "\"barn\": \"test:/barn\", " +
+                "\"calves\": [\"test:/1\", \"test:2\"], " +
+                "\"@context\": \"http://example.org/farm.jsonld\"" +
+                "}";
+
+        try {
+            validating.translate(unexpected);
+            fail("Should have thrown a valiation error");
+        } catch (final BadRequestException e) {
+            // expected
+        }
+
+        // Should not fail
+        nonValidating.translate(unexpected);
     }
 }

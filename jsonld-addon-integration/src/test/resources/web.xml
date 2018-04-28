@@ -4617,6 +4617,12 @@
     <async-supported>true</async-supported>
   </filter>
   
+  <filter>
+    <filter-name>json-merge-patch-filter</filter-name>
+    <filter-class>org.dataconservancy.fcrepo.jsonld.request.JsonMergePatchFilter</filter-class>
+    <async-supported>true</async-supported>
+  </filter>
+  
   
   <filter-mapping>
     <filter-name>jsonld-compaction-filter</filter-name>
@@ -4630,6 +4636,11 @@
 
   <filter-mapping>
     <filter-name>uri-protocol-filter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>json-merge-patch-filter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   
