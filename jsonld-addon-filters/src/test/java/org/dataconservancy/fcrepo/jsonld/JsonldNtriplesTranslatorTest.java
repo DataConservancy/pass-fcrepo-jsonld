@@ -146,4 +146,29 @@ public class JsonldNtriplesTranslatorTest {
         // Should not fail
         validating.translate(goodAlias);
     }
+
+    @Test
+    public void noIdTest() {
+        final JsonldNtriplesTranslator validating = new JsonldNtriplesTranslator(options, true);
+        final JsonldNtriplesTranslator nonValidating = new JsonldNtriplesTranslator(options, false);
+
+        final String noId = "{ " +
+                "\"@type\": \"Cow\", " +
+                "\"unexpectedProperty\": true, " +
+                "\"milkVolume\": 100.6, " +
+                "\"barn\": \"test:/barn\", " +
+                "\"calves\": [\"test:/1\", \"test:2\"], " +
+                "\"@context\": \"http://example.org/farm.jsonld\"" +
+                "}";
+
+        try {
+            validating.translate(noId);
+            fail("Should have thrown a valiation error");
+        } catch (final BadRequestException e) {
+            // expected
+        }
+
+        // Should not fail
+        nonValidating.translate(noId);
+    }
 }

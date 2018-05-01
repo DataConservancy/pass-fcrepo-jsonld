@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -65,12 +66,26 @@ public class JsonldNtriplesTranslator {
 
         URI.create(NULL_RELATIVE);
         try {
+
             if (strict) {
                 verify(jsonld);
             }
 
-            return ((String) JsonLdProcessor.toRDF(fromString(jsonld), RDFDatasetUtils::toNQuads, options))
-                    .replaceAll(NULL_RELATIVE, "");
+            final String ntriples = ((String) JsonLdProcessor.toRDF(fromString(jsonld), RDFDatasetUtils::toNQuads,
+                    options))
+                            .replaceAll(NULL_RELATIVE, "");
+
+            if (strict) {
+                if (Arrays.stream(ntriples.split("\\n"))
+                        .map(String::trim)
+                        .filter(line -> !line.startsWith("<_"))
+                        .collect(Collectors.toList()).isEmpty()) {
+                    throw new BadRequestException(
+                            "No id (e.g. @id) provided. At least use the null-relative URI; \"@id\": \"\"");
+                }
+            }
+
+            return ntriples;
         } catch (JsonLdError | IOException e) {
             throw new BadRequestException("Could not parse jsonld: " + e.getMessage(), e);
         }
