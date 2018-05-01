@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.fcrepo.jsonld.compact;
+package org.dataconservancy.fcrepo.jsonld;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.addStaticContext;
@@ -23,9 +23,6 @@ import static org.junit.Assert.fail;
 
 import java.io.StringReader;
 import java.net.URL;
-
-import org.dataconservancy.fcrepo.jsonld.BadRequestException;
-import org.dataconservancy.fcrepo.jsonld.JsonldNtriplesTranslator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
@@ -44,11 +41,15 @@ public class JsonldNtriplesTranslatorTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        final URL CONTEXT_URL = new URL("http://example.org/farm.jsonld");
 
         options = new JsonLdOptions();
 
-        addStaticContext(CONTEXT_URL, JsonldNtriplesTranslatorTest.class.getResourceAsStream("/context.jsonld"),
+        addStaticContext(new URL("http://example.org/farm.jsonld"), JsonldNtriplesTranslatorTest.class
+                .getResourceAsStream("/context.jsonld"),
+                options);
+
+        addStaticContext(new URL("http://example.org/farm-aliased.jsonld"), JsonMergePatchTranslatorTest.class
+                .getResourceAsStream("/context-aliased.jsonld"),
                 options);
     }
 
@@ -86,7 +87,7 @@ public class JsonldNtriplesTranslatorTest {
     }
 
     @Test
-    public void validationTest() throws Exception {
+    public void validationUnexpectedFieldTest() throws Exception {
         final JsonldNtriplesTranslator validating = new JsonldNtriplesTranslator(options, true);
         final JsonldNtriplesTranslator nonValidating = new JsonldNtriplesTranslator(options, false);
 
@@ -109,5 +110,40 @@ public class JsonldNtriplesTranslatorTest {
 
         // Should not fail
         nonValidating.translate(unexpected);
+    }
+
+    @Test
+    public void validationAliasTest() throws Exception {
+        final JsonldNtriplesTranslator validating = new JsonldNtriplesTranslator(options, true);
+
+        final String badAlias = "{ " +
+                "\"id\": \"test:123\", " +
+                "\"type\": \"Cow\", " +
+                "\"healthy\": true, " +
+                "\"milkVolume\": 100.6, " +
+                "\"barn\": \"test:/barn\", " +
+                "\"calves\": [\"test:/1\", \"test:2\"], " +
+                "\"@context\": \"http://example.org/farm.jsonld\"" +
+                "}";
+
+        final String goodAlias = "{ " +
+                "\"id\": \"test:123\", " +
+                "\"type\": \"Cow\", " +
+                "\"healthy\": true, " +
+                "\"milkVolume\": 100.6, " +
+                "\"barn\": \"test:/barn\", " +
+                "\"calves\": [\"test:/1\", \"test:2\"], " +
+                "\"@context\": \"http://example.org/farm-aliased.jsonld\"" +
+                "}";
+
+        try {
+            validating.translate(badAlias);
+            fail("Should have thrown a valiation error");
+        } catch (final BadRequestException e) {
+            // expected
+        }
+
+        // Should not fail
+        validating.translate(goodAlias);
     }
 }

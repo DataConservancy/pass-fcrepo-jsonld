@@ -56,11 +56,10 @@ public class JsonMergePatchTranslatorTest {
     @BeforeClass
     public static void loadContext() throws Exception {
 
-        final URL CONTEXT_URL = new URL("http://example.org/farm.jsonld");
-
         options = new JsonLdOptions();
 
-        addStaticContext(CONTEXT_URL, JsonMergePatchTranslatorTest.class.getResourceAsStream("/context.jsonld"),
+        addStaticContext(new URL("http://example.org/farm.jsonld"), JsonMergePatchTranslatorTest.class
+                .getResourceAsStream("/context.jsonld"),
                 options);
 
         toTest = new JsonMergePatchTranslator(options, false);

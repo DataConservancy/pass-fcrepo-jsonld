@@ -1,0 +1,19 @@
+ { 
+  "@context": {
+    "farm": "http://example.com/farm/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+
+    "id": "@id",
+    "type": "@type",
+    
+    "Cow": "farm:Cow",
+
+    "healthy": {"@id": "farm:healthy"},
+    "birthDate": {"@id": "farm:birthDate", "@type": "xsd:dateTime"},
+    "name": {"@id": "farm:name"},
+    "milkVolume": {"@id": "farm:milkVolume"},    
+    "weight": {"@id": "farm:weight"},
+    "barn": {"@id": "farm:barn", "@type": "@id"},    
+    "calves": {"@id": "farm:calves", "@container": "@set"}
+  }
+}
