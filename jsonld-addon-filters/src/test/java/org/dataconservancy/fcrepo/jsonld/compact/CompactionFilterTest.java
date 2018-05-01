@@ -22,9 +22,7 @@ import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.COMPACTION_PROP_PRELO
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.COMPACTION_PROP_PRELOAD_URIS;
 import static org.dataconservancy.fcrepo.jsonld.compact.CompactionFilter.CONTEXT_COMPACTION_URI_PROP;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getContextFileLocation;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,6 +30,7 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Paths;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -110,7 +109,6 @@ public class CompactionFilterTest {
             @Override
             public void doFilter(ServletRequest request, ServletResponse response) throws IOException,
                     ServletException {
-                assertEquals(CompactionFilterTest.this.originalRequest, request);
                 CompactionFilterTest.this.filteredResponse = (HttpServletResponse) response;
             }
         };
@@ -143,5 +141,14 @@ public class CompactionFilterTest {
 
         assertTrue(this.originalOutIsClosed);
         assertCompact(new String(out.toByteArray(), UTF_8));
+    }
+
+    private static String getContextFileLocation() {
+        try {
+            return Paths.get(JsonldTestUtil.class.getResource("/preload-context.jsonld").toURI()).toFile()
+                    .getAbsolutePath();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -18,7 +18,8 @@ package org.dataconservancy.fcrepo.jsonld.integration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
+import static org.apache.commons.io.IOUtils.toInputStream;
+import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -28,37 +29,37 @@ import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
 import org.fcrepo.client.FcrepoResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author apb@jhu.edu
  */
-public class CompactionIT implements FcrepoIT {
+public class PlainJsonIT implements FcrepoIT {
+
+    final FcrepoClient client = new FcrepoClientBuilder().throwExceptionOnFailure().build();
 
     static final URI SERVER_MANAGED = URI.create("http://fedora.info/definitions/v4/repository#ServerManaged");
 
+    @Ignore
     @Test
-    public void CompactionTest() throws Exception {
-        final FcrepoClient client = new FcrepoClientBuilder().throwExceptionOnFailure().build();
-
-        final URI jsonldResource = attempt(60, () -> {
+    public void jsonGetTest() throws Exception {
+        final URI resource = attempt(60, () -> {
             try (FcrepoResponse response = client
                     .post(URI.create(fcrepoBaseURI))
-                    .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
+                    .body(toInputStream(getUncompactedJsonld(), UTF_8), "application/ld+json")
                     .perform()) {
                 return response.getLocation();
             }
         });
 
         try (FcrepoResponse response = client
-                .get(jsonldResource)
+                .get(resource)
+                .accept("application/json")
                 .preferRepresentation(emptyList(), Arrays.asList(SERVER_MANAGED))
-                .accept("application/ld+json")
                 .perform()) {
 
-            final String body = IOUtils.toString(response.getBody(), UTF_8);
-            System.out.println(response.getStatusCode());
-            assertCompact(body);
+            System.out.println(IOUtils.toString(response.getBody(), UTF_8));
         }
     }
 }

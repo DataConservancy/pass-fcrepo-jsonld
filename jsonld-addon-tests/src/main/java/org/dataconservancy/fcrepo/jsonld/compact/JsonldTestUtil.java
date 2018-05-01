@@ -19,7 +19,6 @@ package org.dataconservancy.fcrepo.jsonld.compact;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 
@@ -38,7 +37,7 @@ public class JsonldTestUtil {
     public static String getUncompactedJsonld() {
         try {
             return IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
-                    "/file.json"), UTF_8);
+                    "/uncompacted.json"), UTF_8);
         } catch (final IOException e) {
             throw new RuntimeException("Could not read test JSON-LD", e);
         }
@@ -48,14 +47,6 @@ public class JsonldTestUtil {
         final Map<String, Object> testJson = redact(new JSONObject(jsonld).toMap());
 
         ReflectionAssert.assertReflectionEquals(compacted, testJson, ReflectionComparatorMode.LENIENT_ORDER);
-    }
-
-    public static String getContextFileLocation() {
-        try {
-            return Paths.get(JsonldTestUtil.class.getResource("/context.jsonld").toURI()).toFile().getAbsolutePath();
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static Map<String, Object> getCompacted() {

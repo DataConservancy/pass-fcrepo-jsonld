@@ -20,14 +20,17 @@ import static com.github.jsonldjava.utils.JsonUtils.fromString;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
-import com.github.jsonldjava.core.JsonLdApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
-import com.github.jsonldjava.core.RDFDataset;
 import com.github.jsonldjava.utils.JsonUtils;
 
 /**
@@ -37,10 +40,17 @@ import com.github.jsonldjava.utils.JsonUtils;
  */
 class Compactor {
 
-    private JsonLdOptions options = new JsonLdOptions();
+    Logger LOG = LoggerFactory.getLogger(Compactor.class);
 
-    public void setOptions(JsonLdOptions options) {
+    private final JsonLdOptions options;
+
+    private final boolean limitCompaction;
+
+    private static final List<String> INTERNAL_ATTRS = Arrays.asList("@id", "@type");
+
+    public Compactor(JsonLdOptions options, boolean limitCompaction) {
         this.options = options;
+        this.limitCompaction = limitCompaction;
     }
 
     /**
@@ -53,26 +63,49 @@ class Compactor {
      */
     public String compact(String jsonld, URL context) {
         try {
-            return JsonUtils.toString(
-                    JsonLdProcessor.compact(fromString(jsonld), getContext(context), options));
+            final Map<String, Object> cxt = getContext(context);
+
+            System.out.println(jsonld);
+            System.out.println(fromString(jsonld));
+
+            final String compacted = JsonUtils.toPrettyString(
+                    JsonLdProcessor.compact(fromString(jsonld), cxt, options));
+
+            if (limitCompaction) {
+                return stripAttrsNotDefinedInContext(compacted, context, cxt.get("@context"));
+            }
+
+            return compacted;
         } catch (final JsonLdError | IOException ex) {
             throw new RuntimeException("Error converting JsonLd", ex);
         }
     }
 
-    public String compact(RDFDataset rdf, URL context) {
-        try {
-            final Map<String, Object> cxt = new HashMap<>();
-            cxt.put("@context", context.toString());
+    @SuppressWarnings("unchecked")
+    private String stripAttrsNotDefinedInContext(String jsonld, URL context, Object parsedAttrs)
+            throws IOException {
+        final Map<String, Object> parsedJson = (Map<String, Object>) fromString(jsonld);
+        final Map<String, Object> attrs = (Map<String, Object>) parsedAttrs;
+        final List<String> toRemove = new ArrayList<>();
 
-            return JsonUtils.toPrettyString(
-                    JsonLdProcessor.compact(new JsonLdApi(options).fromRDF(rdf), getContext(context), options));
-        } catch (JsonLdError | IOException ex) {
-            throw new RuntimeException("Error converting jsonld", ex);
+        for (final String key : parsedJson.keySet()) {
+            if (!attrs.containsKey(key) && !INTERNAL_ATTRS.contains(key)) {
+                if (!key.equals("@context")) {
+                    LOG.info("Dropping json field {} as it is not in context {}", key, context);
+                }
+                toRemove.add(key);
+            }
         }
+
+        parsedJson.keySet().removeAll(toRemove);
+
+        parsedJson.put("@context", context.toExternalForm());
+
+        return JsonUtils.toPrettyString(parsedJson);
     }
 
-    private Object getContext(URL context) throws JsonLdError {
-        return options.getDocumentLoader().loadDocument(context.toExternalForm()).getDocument();
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getContext(URL context) throws JsonLdError {
+        return (Map<String, Object>) options.getDocumentLoader().loadDocument(context.toExternalForm()).getDocument();
     }
 }

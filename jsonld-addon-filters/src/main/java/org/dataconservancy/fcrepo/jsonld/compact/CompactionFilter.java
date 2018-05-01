@@ -22,6 +22,10 @@ import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.loadContexts;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.Filter;
@@ -31,6 +35,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -49,7 +54,7 @@ public class CompactionFilter implements Filter {
 
     private URL defaultContext;
 
-    private final Compactor compactor = new Compactor();
+    private Compactor compactor;
 
     Logger LOG = LoggerFactory.getLogger(CompactionFilter.class);
 
@@ -76,29 +81,78 @@ public class CompactionFilter implements Filter {
 
         loadContexts(options);
 
-        compactor.setOptions(options);
+        compactor = new Compactor(options, true);
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
 
+        final HttpServletRequest req = (HttpServletRequest) request;
+        final HttpServletResponse resp = (HttpServletResponse) response;
+
         LOG.debug("Compaction filter is considering response");
 
-        final String method = ((HttpServletRequest) request).getMethod();
+        final String method = req.getMethod();
 
-        if (method.equalsIgnoreCase("GET")) {
+        final String accept;
+        if (req.getHeaders("accept") == null) {
+            accept = "application/ld+json";
+        } else {
+            accept = String.join(",", Collections.list(req.getHeaders("accept")));
+        }
+
+        if (method.equalsIgnoreCase("GET") && (accept.contains("application/ld+json") || accept.equals(""))) {
 
             LOG.debug("Compaction filter is compacting");
-            final CompactionWrapper compactionWrapper = new CompactionWrapper((HttpServletResponse) response,
+            final CompactionWrapper compactionWrapper = new CompactionWrapper(resp,
                     compactor,
                     defaultContext);
-            chain.doFilter(request, compactionWrapper);
+            chain.doFilter(new CompactionRequestWrapper(req), compactionWrapper);
             compactionWrapper.getOutputStream().close();
         } else {
             LOG.debug("Compaction filter is doing nothing");
             chain.doFilter(request, response);
         }
+    }
+
+    private class CompactionRequestWrapper extends HttpServletRequestWrapper {
+
+        public CompactionRequestWrapper(HttpServletRequest request) {
+            super(request);
+            getHeaderNames();
+        }
+
+        @Override
+        public String getHeader(String name) {
+            if (name.equalsIgnoreCase("accept")) {
+                return "application/ld+json";
+            } else {
+                return super.getHeader(name);
+            }
+        }
+
+        @Override
+        public Enumeration<String> getHeaders(String name) {
+            if (name.equalsIgnoreCase("accept")) {
+                return Collections.enumeration(Arrays.asList("application/ld+json"));
+            } else {
+                return super.getHeaders(name);
+            }
+        }
+
+        @Override
+        public Enumeration<String> getHeaderNames() {
+            final Enumeration<String> origNames = super.getHeaderNames() == null ? Collections.enumeration(Collections
+                    .emptyList()) : super.getHeaderNames();
+            final List<String> names = Collections.list(origNames);
+            if (!names.contains("accept")) {
+                names.add("accept");
+            }
+
+            return Collections.enumeration(names);
+        }
+
     }
 
     @Override

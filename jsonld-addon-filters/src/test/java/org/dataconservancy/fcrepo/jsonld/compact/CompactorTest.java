@@ -16,12 +16,16 @@
 
 package org.dataconservancy.fcrepo.jsonld.compact;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.addStaticContext;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
+import static org.junit.Assert.fail;
 
 import java.net.URL;
 
+import org.apache.commons.io.IOUtils;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.jsonldjava.core.JsonLdOptions;
@@ -31,20 +35,42 @@ import com.github.jsonldjava.core.JsonLdOptions;
  */
 public class CompactorTest {
 
+    static JsonLdOptions options = new JsonLdOptions();
+
+    static URL CONTEXT_URL;
+
+    @BeforeClass
+    public static void loadContext() throws Exception {
+        CONTEXT_URL = new URL("http://example.org/compactorTest/farm.jsonld");
+        addStaticContext(CONTEXT_URL, CompactorTest.class.getResourceAsStream("/context.jsonld"), options);
+    }
+
     @Test
     public void compactJsonldTest() throws Exception {
 
-        final URL CONTEXT_URL = new URL("http://example.org/compactorTest/farm.jsonld");
-
-        final JsonLdOptions options = new JsonLdOptions();
-
-        addStaticContext(CONTEXT_URL, this.getClass().getResourceAsStream("/context.jsonld"), options);
-
-        final Compactor compactor = new Compactor();
-        compactor.setOptions(options);
+        final Compactor compactor = new Compactor(options, true);
 
         final String JSON = getUncompactedJsonld();
 
         assertCompact(compactor.compact(JSON, CONTEXT_URL));
+    }
+
+    @Test
+    public void dropUnknownAttrTest() throws Exception {
+        final Compactor willDrop = new Compactor(options, true);
+        final Compactor willNotDrop = new Compactor(options, false);
+
+        final String hasDataNotInContext = IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
+                "/uncompacted-with-unwanted-data.json"), UTF_8);
+
+        try {
+            assertCompact(willNotDrop.compact(hasDataNotInContext, CONTEXT_URL));
+            fail("Should have failed compaction comparison");
+        } catch (final AssertionError e) {
+            System.out.println("OK");
+        }
+
+        assertCompact(willDrop.compact(hasDataNotInContext, CONTEXT_URL));
+
     }
 }
