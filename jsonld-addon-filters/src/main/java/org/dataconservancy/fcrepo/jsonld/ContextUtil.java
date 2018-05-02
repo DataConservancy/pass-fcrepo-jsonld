@@ -36,6 +36,8 @@ public class ContextUtil {
 
     static final ObjectMapper mapper = new ObjectMapper();
 
+    public static final String PREDICATE_HAS_CONTEXT = "http://dataconservancy.org/ns/jsonld#hasContext";
+
     public static String stripContext(String json) {
 
         try {

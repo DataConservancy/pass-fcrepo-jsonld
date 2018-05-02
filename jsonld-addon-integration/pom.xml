@@ -28,7 +28,6 @@
         <fcrepo.dynamic.test.port>8080</fcrepo.dynamic.test.port>
         <fcrepo.dynamic.jms.port>61616</fcrepo.dynamic.jms.port>
         <fcrepo.dynamic.stomp.port>61613</fcrepo.dynamic.stomp.port>
-        <FUSEKI_PORT>3030</FUSEKI_PORT>
       </properties>
     </profile>
   </profiles>
@@ -74,7 +73,6 @@
         </executions>
         <configuration>
           <systemPropertyVariables>
-            <fuseki.port>${FUSEKI_PORT}</fuseki.port>
             <fcrepo.dynamic.test.port>${fcrepo.dynamic.test.port}</fcrepo.dynamic.test.port>
             <fcrepo.cxtPath>${fcrepo.cxtPath}</fcrepo.cxtPath>
             <fcrepo.dynamic.jms.port>${fcrepo.dynamic.jms.port}</fcrepo.dynamic.jms.port>
@@ -101,7 +99,9 @@
               <compaction.uri>${compaction.uri}</compaction.uri>
               <compaction.preload.uri.farm>${compaction.preload.uri.farm}</compaction.preload.uri.farm>
               <compaction.preload.file.farm>${compaction.preload.file.farm}</compaction.preload.file.farm>
-              <strict.jsonld>true</strict.jsonld>
+              <jsonld.strict>true</jsonld.strict>
+              <jsonld.context.minimal>true</jsonld.context.minimal>
+              <jsonld.context.persist>true</jsonld.context.persist>
               <fcrepo.home>${project.build.directory}/fcrepo</fcrepo.home>
               <fcrepo.modeshape.configuration>classpath:/config/file-simple/repository.json</fcrepo.modeshape.configuration>
               <fcrepo.dynamic.jms.port>${fcrepo.dynamic.jms.port}</fcrepo.dynamic.jms.port>

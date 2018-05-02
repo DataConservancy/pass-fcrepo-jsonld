@@ -16,7 +16,9 @@
 
 package org.dataconservancy.fcrepo.jsonld;
 
+import static org.dataconservancy.fcrepo.jsonld.ContextUtil.PREDICATE_HAS_CONTEXT;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.addStaticContext;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -26,6 +28,8 @@ import java.net.URL;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.update.UpdateAction;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -62,8 +66,8 @@ public class JsonMergePatchTranslatorTest {
                 .getResourceAsStream("/context.jsonld"),
                 options);
 
-        toTest = new JsonMergePatchTranslator(options, false);
-        nt = new JsonldNtriplesTranslator(options, false);
+        toTest = new JsonMergePatchTranslator(options, false, false);
+        nt = new JsonldNtriplesTranslator(options, false, false);
     }
 
     @Test
@@ -235,6 +239,34 @@ public class JsonMergePatchTranslatorTest {
         } catch (final BadRequestException e) {
             // good;
         }
+    }
+
+    @Test
+    public void persistContextTest() throws Exception {
+        final JsonMergePatchTranslator translatorWithPersistence = new JsonMergePatchTranslator(options, false, true);
+
+        final String input = "{ " +
+                "\"@id\": \"test:123\", " +
+                "\"@type\": \"Cow\", " +
+                "\"healthy\": true, " +
+                "\"milkVolume\": 100.6, " +
+                "\"barn\": \"test:/barn\", " +
+                "\"calves\": [\"test:/1\"], " +
+                "\"@context\": \"http://example.org/farm.jsonld\"" +
+                "}";
+
+        final Model existing = ModelFactory.createDefaultModel();
+        final Property hasContext = existing.createProperty(PREDICATE_HAS_CONTEXT);
+        existing.add(
+                existing.createResource("test:123"),
+                hasContext,
+                existing.createResource("test:obsolete"));
+
+        UpdateAction.parseExecute(translatorWithPersistence.toSparql(input, null), existing);
+
+        assertEquals(1, existing.listStatements(null, hasContext, (RDFNode) null).toList().size());
+        assertEquals(1, existing.listStatements(null, hasContext, existing.createResource(
+                "http://example.org/farm.jsonld")).toList().size());
     }
 
     private Model toModel(String jsonld) {

@@ -20,6 +20,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.addStaticContext;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URL;
@@ -48,7 +50,7 @@ public class CompactorTest {
     @Test
     public void compactJsonldTest() throws Exception {
 
-        final Compactor compactor = new Compactor(options, true);
+        final Compactor compactor = new Compactor(options, true, false);
 
         final String JSON = getUncompactedJsonld();
 
@@ -57,8 +59,8 @@ public class CompactorTest {
 
     @Test
     public void dropUnknownAttrTest() throws Exception {
-        final Compactor willDrop = new Compactor(options, true);
-        final Compactor willNotDrop = new Compactor(options, false);
+        final Compactor willDrop = new Compactor(options, true, false);
+        final Compactor willNotDrop = new Compactor(options, false, false);
 
         final String hasDataNotInContext = IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
                 "/uncompacted-with-unwanted-data.json"), UTF_8);
@@ -71,6 +73,24 @@ public class CompactorTest {
         }
 
         assertCompact(willDrop.compact(hasDataNotInContext, CONTEXT_URL));
+    }
 
+    @Test
+    public void persistedContextTest() throws Exception {
+        final URL MY_CONTEXT = new URL("http://example.org/farm");
+        final JsonLdOptions myOptions = new JsonLdOptions();
+
+        addStaticContext(MY_CONTEXT, CompactorTest.class.getResourceAsStream("/context.jsonld"), myOptions);
+        addStaticContext(CONTEXT_URL, CompactorTest.class.getResourceAsStream("/context.jsonld"), myOptions);
+
+        final Compactor withPersist = new Compactor(myOptions, true, true);
+
+        final String jsonWithPersistedContext = IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
+                "/compact-uri-with-persisted-context.json"), UTF_8);
+
+        final String results = withPersist.compact(jsonWithPersistedContext, CONTEXT_URL);
+        assertCompact(results);
+        assertTrue(results.contains(MY_CONTEXT.toExternalForm()));
+        assertFalse(results.contains(CONTEXT_URL.toExternalForm()));
     }
 }

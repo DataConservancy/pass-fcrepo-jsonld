@@ -17,6 +17,7 @@
 package org.dataconservancy.fcrepo.jsonld;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.dataconservancy.fcrepo.jsonld.ContextUtil.PREDICATE_HAS_CONTEXT;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.addStaticContext;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -57,7 +58,7 @@ public class JsonldNtriplesTranslatorTest {
     @Test
     public void nullRelativeIdTest() throws Exception {
 
-        final JsonldNtriplesTranslator t = new JsonldNtriplesTranslator(options, false);
+        final JsonldNtriplesTranslator t = new JsonldNtriplesTranslator(options, false, false);
 
         final String JSON = IOUtils.toString(this.getClass().getResourceAsStream("/null-relative.json"), UTF_8);
 
@@ -75,7 +76,7 @@ public class JsonldNtriplesTranslatorTest {
     @Test
     public void linkedContextTest() throws Exception {
 
-        final JsonldNtriplesTranslator t = new JsonldNtriplesTranslator(options, false);
+        final JsonldNtriplesTranslator t = new JsonldNtriplesTranslator(options, false, false);
 
         final String JSON = IOUtils.toString(this.getClass().getResourceAsStream("/uri-context.json"), UTF_8);
 
@@ -88,8 +89,8 @@ public class JsonldNtriplesTranslatorTest {
 
     @Test
     public void validationUnexpectedFieldTest() throws Exception {
-        final JsonldNtriplesTranslator validating = new JsonldNtriplesTranslator(options, true);
-        final JsonldNtriplesTranslator nonValidating = new JsonldNtriplesTranslator(options, false);
+        final JsonldNtriplesTranslator validating = new JsonldNtriplesTranslator(options, true, false);
+        final JsonldNtriplesTranslator nonValidating = new JsonldNtriplesTranslator(options, false, false);
 
         final String unexpected = "{ " +
                 "\"@id\": \"test:123\", " +
@@ -114,7 +115,7 @@ public class JsonldNtriplesTranslatorTest {
 
     @Test
     public void validationAliasTest() throws Exception {
-        final JsonldNtriplesTranslator validating = new JsonldNtriplesTranslator(options, true);
+        final JsonldNtriplesTranslator validating = new JsonldNtriplesTranslator(options, true, false);
 
         final String badAlias = "{ " +
                 "\"id\": \"test:123\", " +
@@ -149,8 +150,8 @@ public class JsonldNtriplesTranslatorTest {
 
     @Test
     public void noIdTest() {
-        final JsonldNtriplesTranslator validating = new JsonldNtriplesTranslator(options, true);
-        final JsonldNtriplesTranslator nonValidating = new JsonldNtriplesTranslator(options, false);
+        final JsonldNtriplesTranslator validating = new JsonldNtriplesTranslator(options, true, false);
+        final JsonldNtriplesTranslator nonValidating = new JsonldNtriplesTranslator(options, false, false);
 
         final String noId = "{ " +
                 "\"@type\": \"Cow\", " +
@@ -170,5 +171,26 @@ public class JsonldNtriplesTranslatorTest {
 
         // Should not fail
         nonValidating.translate(noId);
+    }
+
+    @Test
+    public void persistContextTest() {
+        final JsonldNtriplesTranslator t = new JsonldNtriplesTranslator(options, false, true);
+
+        final String DESIRED_CONTEXT = "http://example.org/farm-aliased.jsonld";
+
+        final String withContext = "{ " +
+                "\"@id\": \"test:123\", " +
+                "\"@type\": \"Cow\", " +
+                "\"healthy\": true, " +
+                "\"milkVolume\": 100.6, " +
+                "\"barn\": \"test:/barn\", " +
+                "\"calves\": [\"test:/1\", \"test:2\"], " +
+                "\"@context\": \"http://example.org/farm-aliased.jsonld\"" +
+                "}";
+
+        final String triples = t.translate(withContext);
+
+        assertTrue(triples.contains("<" + PREDICATE_HAS_CONTEXT + "> <" + DESIRED_CONTEXT + ">"));
     }
 }

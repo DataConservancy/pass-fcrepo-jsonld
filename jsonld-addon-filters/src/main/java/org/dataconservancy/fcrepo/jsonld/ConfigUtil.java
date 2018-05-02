@@ -32,7 +32,11 @@ import org.slf4j.LoggerFactory;
  */
 public class ConfigUtil {
 
-    public static final String STRICT_JSONLD = "strict.jsonld";
+    public static final String JSONLD_STRICT = "jsonld.strict";
+
+    public static final String JSONLD_MINIMAL_CONTEXT = "jsonld.context.minimal";
+
+    public static final String JSONLD_PERSIST_CONTEXT = "jsonld.context.persist";
 
     static final Logger LOG = LoggerFactory.getLogger(ConfigUtil.class);
 

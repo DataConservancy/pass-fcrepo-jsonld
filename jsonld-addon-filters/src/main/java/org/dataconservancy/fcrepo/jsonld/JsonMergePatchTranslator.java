@@ -18,6 +18,7 @@ package org.dataconservancy.fcrepo.jsonld;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static org.dataconservancy.fcrepo.jsonld.ContextUtil.PREDICATE_HAS_CONTEXT;
 import static org.dataconservancy.fcrepo.jsonld.ContextUtil.getContext;
 
 import java.io.IOException;
@@ -41,11 +42,14 @@ public class JsonMergePatchTranslator {
 
     final JsonldNtriplesTranslator translator;
 
+    final boolean persistContexts;
+
     List<String> excluded = asList("@context");
 
-    public JsonMergePatchTranslator(JsonLdOptions options, boolean strict) {
+    public JsonMergePatchTranslator(JsonLdOptions options, boolean strict, boolean persistContexts) {
         this.options = options;
-        translator = new JsonldNtriplesTranslator(options, strict);
+        this.persistContexts = persistContexts;
+        translator = new JsonldNtriplesTranslator(options, strict, persistContexts);
     }
 
     public String toSparql(String jsonld, URI defaultContext) throws BadRequestException {
@@ -78,6 +82,10 @@ public class JsonMergePatchTranslator {
 
         for (final String name : (Iterable<String>) () -> parsedMergePatch.fieldNames()) {
             builder.deleteWithPredicate(attrs.get(name));
+        }
+
+        if (persistContexts) {
+            builder.deleteWithPredicate(PREDICATE_HAS_CONTEXT);
         }
 
         builder.addStatements(translator.translate(jsonldWithContext));

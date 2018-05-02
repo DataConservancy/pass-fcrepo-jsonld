@@ -16,6 +16,8 @@
 
 package org.dataconservancy.fcrepo.jsonld.compact;
 
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.JSONLD_PERSIST_CONTEXT;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.JSONLD_STRICT;
 import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.getValue;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.loadContexts;
 
@@ -81,7 +83,17 @@ public class CompactionFilter implements Filter {
 
         loadContexts(options);
 
-        compactor = new Compactor(options, true);
+        boolean limitContexts = false;
+        if (getValue(JSONLD_STRICT) != null && !getValue(JSONLD_STRICT).equals("false")) {
+            limitContexts = true;
+        }
+
+        boolean usePersistedContext = false;
+        if (getValue(JSONLD_PERSIST_CONTEXT) != null && !getValue(JSONLD_PERSIST_CONTEXT).equals("false")) {
+            usePersistedContext = true;
+        }
+
+        compactor = new Compactor(options, limitContexts, usePersistedContext);
     }
 
     @Override

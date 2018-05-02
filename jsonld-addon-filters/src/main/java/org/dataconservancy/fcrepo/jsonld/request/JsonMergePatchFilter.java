@@ -17,7 +17,8 @@
 package org.dataconservancy.fcrepo.jsonld.request;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.STRICT_JSONLD;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.JSONLD_PERSIST_CONTEXT;
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.JSONLD_STRICT;
 import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.getValue;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.loadContexts;
 
@@ -74,11 +75,16 @@ public class JsonMergePatchFilter implements Filter {
         loadContexts(options);
 
         boolean strict = false;
-        if (getValue(STRICT_JSONLD) != null && !getValue(STRICT_JSONLD).equals("false")) {
+        if (getValue(JSONLD_STRICT) != null && !getValue(JSONLD_STRICT).equals("false")) {
             strict = true;
         }
 
-        translator = new JsonMergePatchTranslator(options, strict);
+        boolean persistContexts = false;
+        if (getValue(JSONLD_PERSIST_CONTEXT) != null && !getValue(JSONLD_PERSIST_CONTEXT).equals("false")) {
+            persistContexts = true;
+        }
+
+        translator = new JsonMergePatchTranslator(options, strict, persistContexts);
     }
 
     @Override

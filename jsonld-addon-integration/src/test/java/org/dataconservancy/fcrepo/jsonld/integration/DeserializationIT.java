@@ -17,11 +17,9 @@
 package org.dataconservancy.fcrepo.jsonld.integration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyList;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import org.fcrepo.client.FcrepoClient;
@@ -35,8 +33,6 @@ import org.junit.Test;
  * @author apb@jhu.edu
  */
 public class DeserializationIT {
-
-    static final URI SERVER_MANAGED = URI.create("http://fedora.info/definitions/v4/repository#ServerManaged");
 
     String fcrepoBaseURI = String.format("http://localhost:%s/%s/rest/", System.getProperty(
             "fcrepo.dynamic.test.port", "8080"), System.getProperty("fcrepo.cxtPath", "fcrepo"));
@@ -57,7 +53,6 @@ public class DeserializationIT {
 
         try (FcrepoResponse response = client
                 .get(jsonldResource)
-                .preferRepresentation(emptyList(), Arrays.asList(SERVER_MANAGED))
                 .accept("application/ld+json")
                 .perform()) {
 

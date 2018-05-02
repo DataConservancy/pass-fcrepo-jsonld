@@ -17,13 +17,11 @@
 package org.dataconservancy.fcrepo.jsonld.integration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyList;
 import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 import java.net.URI;
-import java.util.Arrays;
 
 import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
@@ -45,8 +43,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author apb@jhu.edu
  */
 public class JsonMergePatchIT implements FcrepoIT {
-
-    static final URI SERVER_MANAGED = URI.create("http://fedora.info/definitions/v4/repository#ServerManaged");
 
     final FcrepoClient client = new FcrepoClientBuilder().throwExceptionOnFailure().build();
 
@@ -114,7 +110,6 @@ public class JsonMergePatchIT implements FcrepoIT {
 
         try (FcrepoResponse response = client.get(id)
                 .accept("application/ld+json")
-                .preferRepresentation(emptyList(), Arrays.asList(SERVER_MANAGED))
                 .perform()) {
             final ObjectNode orig = (ObjectNode) mapper.readTree(IOUtils.toString(response.getBody(), UTF_8));
             orig.remove("@context");
@@ -128,7 +123,6 @@ public class JsonMergePatchIT implements FcrepoIT {
 
         try (FcrepoResponse response = client.get(id)
                 .accept("application/ld+json")
-                .preferRepresentation(emptyList(), Arrays.asList(SERVER_MANAGED))
                 .perform()) {
             return IOUtils.toString(response.getBody(), UTF_8);
         }

@@ -17,11 +17,9 @@
 package org.dataconservancy.fcrepo.jsonld.integration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyList;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
 
 import java.net.URI;
-import java.util.Arrays;
 
 import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
@@ -34,8 +32,6 @@ import org.junit.Test;
  * @author apb@jhu.edu
  */
 public class CompactionIT implements FcrepoIT {
-
-    static final URI SERVER_MANAGED = URI.create("http://fedora.info/definitions/v4/repository#ServerManaged");
 
     @Test
     public void CompactionTest() throws Exception {
@@ -52,7 +48,6 @@ public class CompactionIT implements FcrepoIT {
 
         try (FcrepoResponse response = client
                 .get(jsonldResource)
-                .preferRepresentation(emptyList(), Arrays.asList(SERVER_MANAGED))
                 .accept("application/ld+json")
                 .perform()) {
 

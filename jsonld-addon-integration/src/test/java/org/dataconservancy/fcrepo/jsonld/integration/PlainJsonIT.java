@@ -17,12 +17,10 @@
 package org.dataconservancy.fcrepo.jsonld.integration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyList;
 import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
 
 import java.net.URI;
-import java.util.Arrays;
 
 import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
@@ -39,8 +37,6 @@ public class PlainJsonIT implements FcrepoIT {
 
     final FcrepoClient client = new FcrepoClientBuilder().throwExceptionOnFailure().build();
 
-    static final URI SERVER_MANAGED = URI.create("http://fedora.info/definitions/v4/repository#ServerManaged");
-
     @Ignore
     @Test
     public void jsonGetTest() throws Exception {
@@ -56,7 +52,6 @@ public class PlainJsonIT implements FcrepoIT {
         try (FcrepoResponse response = client
                 .get(resource)
                 .accept("application/json")
-                .preferRepresentation(emptyList(), Arrays.asList(SERVER_MANAGED))
                 .perform()) {
 
             System.out.println(IOUtils.toString(response.getBody(), UTF_8));

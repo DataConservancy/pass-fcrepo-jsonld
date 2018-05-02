@@ -17,6 +17,7 @@
 package org.dataconservancy.fcrepo.jsonld;
 
 import static com.github.jsonldjava.utils.JsonUtils.fromString;
+import static org.dataconservancy.fcrepo.jsonld.ContextUtil.PREDICATE_HAS_CONTEXT;
 import static org.dataconservancy.fcrepo.jsonld.ContextUtil.getContext;
 
 import java.io.IOException;
@@ -53,15 +54,19 @@ public class JsonldNtriplesTranslator {
 
     private final boolean strict;
 
+    private final boolean persistContext;
+
     ObjectMapper mapper = new ObjectMapper();
 
-    public JsonldNtriplesTranslator(JsonLdOptions options, boolean strict) {
+    public JsonldNtriplesTranslator(JsonLdOptions options, boolean strict, boolean persistContext) {
         this.options = cloner.deepClone(options);
         this.options.format = "application/nquads";
         this.options.setBase(NULL_RELATIVE);
         this.strict = strict;
+        this.persistContext = persistContext;
     }
 
+    @SuppressWarnings("unchecked")
     public String translate(String jsonld) {
 
         URI.create(NULL_RELATIVE);
@@ -71,9 +76,17 @@ public class JsonldNtriplesTranslator {
                 verify(jsonld);
             }
 
-            final String ntriples = ((String) JsonLdProcessor.toRDF(fromString(jsonld), RDFDatasetUtils::toNQuads,
-                    options))
-                            .replaceAll(NULL_RELATIVE, "");
+            final Object parsed = fromString(jsonld);
+            String ntriples = ((String) JsonLdProcessor.toRDF(parsed,
+                    RDFDatasetUtils::toNQuads,
+                    options)).replaceAll(NULL_RELATIVE, "");
+
+            if (persistContext && parsed instanceof Map) {
+                final Object cxt = ((Map<String, Object>) parsed).get("@context");
+                if (cxt instanceof String) {
+                    ntriples = ntriples + String.format("<> <%s> <%s> .\n", PREDICATE_HAS_CONTEXT, cxt);
+                }
+            }
 
             if (strict) {
                 if (Arrays.stream(ntriples.split("\\n"))
