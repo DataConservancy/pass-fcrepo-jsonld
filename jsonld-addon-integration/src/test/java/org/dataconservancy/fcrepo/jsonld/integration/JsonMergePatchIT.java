@@ -63,11 +63,8 @@ public class JsonMergePatchIT implements FcrepoIT {
                 "\"@context\": \"http://example.org/farm\"" +
                 "}";
 
-        System.out.println("Adding");
         final URI id = add(originalResource);
-        System.out.println(id);
 
-        System.out.println("Done adding");
         final String result = doPatch(id, String.format("{ " +
                 "\"@id\": \"%s\", " + "\"@context\": \"http://example.org/farm\"" + "}", id));
         assertJsonEquals(originalResource, result);
@@ -84,9 +81,6 @@ public class JsonMergePatchIT implements FcrepoIT {
         patched.remove("@context");
         patched.remove("@id");
         patched.remove("id");
-
-        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(orig));
-        System.err.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(patched));
 
         assertReflectionEquals(orig, patched, ReflectionComparatorMode.LENIENT_ORDER);
 

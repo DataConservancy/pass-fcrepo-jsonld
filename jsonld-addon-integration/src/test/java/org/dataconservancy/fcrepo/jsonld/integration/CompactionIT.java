@@ -34,7 +34,7 @@ import org.junit.Test;
 public class CompactionIT implements FcrepoIT {
 
     @Test
-    public void CompactionTest() throws Exception {
+    public void compactionTest() throws Exception {
         final FcrepoClient client = new FcrepoClientBuilder().throwExceptionOnFailure().build();
 
         final URI jsonldResource = attempt(60, () -> {
@@ -52,7 +52,6 @@ public class CompactionIT implements FcrepoIT {
                 .perform()) {
 
             final String body = IOUtils.toString(response.getBody(), UTF_8);
-            System.out.println(response.getStatusCode());
             assertCompact(body);
         }
     }

@@ -69,7 +69,7 @@ public class CompactorTest {
             assertCompact(willNotDrop.compact(hasDataNotInContext, CONTEXT_URL));
             fail("Should have failed compaction comparison");
         } catch (final AssertionError e) {
-            System.out.println("OK");
+            // OK
         }
 
         assertCompact(willDrop.compact(hasDataNotInContext, CONTEXT_URL));

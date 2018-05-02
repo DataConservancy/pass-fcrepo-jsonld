@@ -20,7 +20,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
 
 import java.net.URI;
-import java.util.concurrent.Callable;
 
 import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
@@ -32,7 +31,7 @@ import org.junit.Test;
 /**
  * @author apb@jhu.edu
  */
-public class DeserializationIT {
+public class DeserializationIT implements FcrepoIT {
 
     String fcrepoBaseURI = String.format("http://localhost:%s/%s/rest/", System.getProperty(
             "fcrepo.dynamic.test.port", "8080"), System.getProperty("fcrepo.cxtPath", "fcrepo"));
@@ -61,26 +60,5 @@ public class DeserializationIT {
             assertCompact(body);
         }
 
-    }
-
-    static <T> T attempt(final int times, final Callable<T> it) {
-
-        Throwable caught = null;
-
-        for (int tries = 0; tries < times; tries++) {
-            try {
-                return it.call();
-            } catch (final Throwable e) {
-                caught = e;
-                try {
-                    Thread.sleep(1000);
-                    System.out.println(".");
-                } catch (final InterruptedException i) {
-                    Thread.currentThread().interrupt();
-                    return null;
-                }
-            }
-        }
-        throw new RuntimeException("Failed executing task", caught);
     }
 }
