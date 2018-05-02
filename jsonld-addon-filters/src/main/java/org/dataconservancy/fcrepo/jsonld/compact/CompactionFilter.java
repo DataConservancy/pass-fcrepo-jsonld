@@ -16,8 +16,8 @@
 
 package org.dataconservancy.fcrepo.jsonld.compact;
 
+import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.JSONLD_MINIMAL_CONTEXT;
 import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.JSONLD_PERSIST_CONTEXT;
-import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.JSONLD_STRICT;
 import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.getValue;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.loadContexts;
 
@@ -58,6 +58,8 @@ public class CompactionFilter implements Filter {
 
     private Compactor compactor;
 
+    private Compactor rawCompactor;
+
     Logger LOG = LoggerFactory.getLogger(CompactionFilter.class);
 
     @Override
@@ -84,7 +86,7 @@ public class CompactionFilter implements Filter {
         loadContexts(options);
 
         boolean limitContexts = false;
-        if (getValue(JSONLD_STRICT) != null && !getValue(JSONLD_STRICT).equals("false")) {
+        if (getValue(JSONLD_MINIMAL_CONTEXT) != null && !getValue(JSONLD_MINIMAL_CONTEXT).equals("false")) {
             limitContexts = true;
         }
 
@@ -94,6 +96,7 @@ public class CompactionFilter implements Filter {
         }
 
         compactor = new Compactor(options, limitContexts, usePersistedContext);
+        rawCompactor = new Compactor(options, false, false);
     }
 
     @Override
@@ -114,12 +117,23 @@ public class CompactionFilter implements Filter {
             accept = String.join(",", Collections.list(req.getHeaders("accept")));
         }
 
+        // Hack to allow ember adapter to be happy for findAll
+        boolean useRawCompaction = false;
+        if (Optional.ofNullable(req.getHeader("Prefer")).orElse("").contains("embed")) {
+            useRawCompaction = true;
+        }
+
         if (method.equalsIgnoreCase("GET") && (accept.contains("application/ld+json") || accept.equals(""))) {
 
             LOG.debug("Compaction filter is compacting");
-            final CompactionWrapper compactionWrapper = new CompactionWrapper(resp,
-                    compactor,
-                    defaultContext);
+            final CompactionWrapper compactionWrapper;
+            if (useRawCompaction) {
+                compactionWrapper = new CompactionWrapper(resp, rawCompactor, defaultContext);
+            } else {
+                compactionWrapper = new CompactionWrapper(resp,
+                        compactor,
+                        defaultContext);
+            }
             chain.doFilter(new CompactionRequestWrapper(req), compactionWrapper);
             compactionWrapper.getOutputStream().close();
         } else {
