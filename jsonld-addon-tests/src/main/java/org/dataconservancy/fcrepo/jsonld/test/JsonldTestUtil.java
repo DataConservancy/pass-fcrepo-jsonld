@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.fcrepo.jsonld.compact;
+package org.dataconservancy.fcrepo.jsonld.test;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

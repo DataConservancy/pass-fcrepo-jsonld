@@ -16,7 +16,15 @@
 
 package org.dataconservancy.fcrepo.jsonld.integration;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
 import java.util.concurrent.Callable;
+
+import org.fcrepo.client.FcrepoResponse;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * @author apb@jhu.edu
@@ -45,5 +53,12 @@ public interface FcrepoIT {
             }
         }
         throw new RuntimeException("Failed executing task", caught);
+    }
+
+    static void assertSuccess(FcrepoResponse response) throws IOException {
+        if (response.getStatusCode() > 299) {
+            final String message = IOUtils.toString(response.getBody(), UTF_8);
+            fail("Fcrepo request failed, " + response.getStatusCode() + ": " + message);
+        }
     }
 }

@@ -44,7 +44,10 @@ public class JsonMergePatchTranslator {
 
     final boolean persistContexts;
 
-    List<String> excluded = asList("@context");
+    // Hack around Fedora bug: prevent DELETE statements involving rdf types in SPARQL
+    List<String> excluded = asList("@context", "@type");
+
+    static final String RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
     public JsonMergePatchTranslator(JsonLdOptions options, boolean strict, boolean persistContexts) {
         this.options = options;
@@ -78,10 +81,12 @@ public class JsonMergePatchTranslator {
         }
 
         final Map<String, String> attrs = getContext(parsedMergePatch, options).getPrefixes(false);
-        attrs.put("@type", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+        attrs.put("@type", RDF_TYPE);
 
         for (final String name : (Iterable<String>) () -> parsedMergePatch.fieldNames()) {
-            builder.deleteWithPredicate(attrs.get(name));
+            if (attrs.containsKey(name) && !excluded.contains(name)) {
+                builder.deleteWithPredicate(attrs.get(name));
+            }
         }
 
         if (persistContexts) {

@@ -130,7 +130,7 @@ public class JsonMergePatchFilter implements Filter {
                 final String sparql = translator.toSparql(IOUtils.toString(origInput, UTF_8), null);
 
                 final byte[] sparqlBody = sparql.getBytes(UTF_8);
-                LOG.warn("Translated to sparql/update: " + sparql);
+                LOG.debug("Translated to sparql/update: " + sparql);
                 length = sparqlBody.length;
                 translated = new ByteArrayInputStream(sparqlBody);
             } catch (final IOException e) {

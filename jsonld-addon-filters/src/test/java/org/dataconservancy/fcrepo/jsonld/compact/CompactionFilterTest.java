@@ -21,8 +21,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.COMPACTION_PROP_PRELOAD_FILES;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.COMPACTION_PROP_PRELOAD_URIS;
 import static org.dataconservancy.fcrepo.jsonld.compact.CompactionFilter.CONTEXT_COMPACTION_URI_PROP;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
+import static org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil.assertCompact;
+import static org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil.getUncompactedJsonld;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,6 +41,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil;
 
 import org.junit.After;
 import org.junit.Before;

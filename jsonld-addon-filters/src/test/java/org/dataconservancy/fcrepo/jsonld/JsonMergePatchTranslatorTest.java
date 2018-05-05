@@ -20,11 +20,12 @@ import static org.dataconservancy.fcrepo.jsonld.ContextUtil.PREDICATE_HAS_CONTEX
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.addStaticContext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
+
+import org.dataconservancy.fcrepo.jsonld.test.JsonMergePatchTests;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -39,7 +40,7 @@ import com.github.jsonldjava.core.JsonLdOptions;
 /**
  * @author apb@jhu.edu
  */
-public class JsonMergePatchTranslatorTest {
+public class JsonMergePatchTranslatorTest extends JsonMergePatchTests {
 
     static JsonLdOptions options = new JsonLdOptions();
 
@@ -47,155 +48,17 @@ public class JsonMergePatchTranslatorTest {
 
     static JsonldNtriplesTranslator nt;
 
-    static final String initial = "{ " +
-            "\"@id\": \"test:123\", " +
-            "\"@type\": \"Cow\", " +
-            "\"healthy\": true, " +
-            "\"milkVolume\": 100.6, " +
-            "\"barn\": \"test:/barn\", " +
-            "\"calves\": [\"test:/1\", \"test:2\"], " +
-            "\"@context\": \"http://example.org/farm.jsonld\"" +
-            "}";
-
     @BeforeClass
     public static void loadContext() throws Exception {
 
         options = new JsonLdOptions();
 
-        addStaticContext(new URL("http://example.org/farm.jsonld"), JsonMergePatchTranslatorTest.class
+        addStaticContext(new URL("http://example.org/farm"), JsonMergePatchTranslatorTest.class
                 .getResourceAsStream("/context.jsonld"),
                 options);
 
         toTest = new JsonMergePatchTranslator(options, false, false);
         nt = new JsonldNtriplesTranslator(options, false, false);
-    }
-
-    @Test
-    public void identityTest() throws Exception {
-
-        final Model rdf = toModel(initial);
-
-        final Model expected = ModelFactory.createDefaultModel().add(rdf);
-
-        UpdateAction.parseExecute(toTest.toSparql(initial, null), rdf);
-
-        assertTrue(expected.isIsomorphicWith(rdf));
-    }
-
-    @Test
-    public void noOpTest() throws Exception {
-        final Model rdf = toModel(initial);
-
-        final Model expected = ModelFactory.createDefaultModel().add(rdf);
-
-        final String noop = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}";
-
-        UpdateAction.parseExecute(toTest.toSparql(noop, null), rdf);
-
-        assertTrue(expected.isIsomorphicWith(rdf));
-    }
-
-    @Test
-    public void deleteAttributeTest() throws Exception {
-        final Model rdf = toModel(initial);
-
-        final String deleteHealthy = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"healthy\": null, " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}";
-
-        final Model expected = toModel("{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"], " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}");
-
-        UpdateAction.parseExecute(toTest.toSparql(deleteHealthy, null), rdf);
-
-        assertTrue(expected.isIsomorphicWith(rdf));
-    }
-
-    @Test
-    public void addAttributeTest() throws Exception {
-        final Model rdf = toModel(initial);
-
-        final String addHealthy = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"name\": \"bessie\", " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}";
-
-        final Model expected = toModel("{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"name\": \"bessie\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"], " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}");
-
-        UpdateAction.parseExecute(toTest.toSparql(addHealthy, null), rdf);
-
-        assertTrue(expected.isIsomorphicWith(rdf));
-    }
-
-    @Test
-    public void addToListTest() throws Exception {
-        final Model rdf = toModel(initial);
-
-        final String addHealthy = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"calves\": [\"test:/1\", \"test:2\", \"test:3\"], " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}";
-
-        final Model expected = toModel("{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\", \"test:2\", \"test:3\"], " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}");
-
-        UpdateAction.parseExecute(toTest.toSparql(addHealthy, null), rdf);
-
-        assertTrue(expected.isIsomorphicWith(rdf));
-    }
-
-    @Test
-    public void removeFromListTest() throws Exception {
-        final Model rdf = toModel(initial);
-
-        final String addHealthy = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"calves\": [\"test:/1\"], " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}";
-
-        final Model expected = toModel("{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\"], " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}");
-
-        UpdateAction.parseExecute(toTest.toSparql(addHealthy, null), rdf);
-
-        assertTrue(expected.isIsomorphicWith(rdf));
     }
 
     @Test
@@ -209,36 +72,14 @@ public class JsonMergePatchTranslatorTest {
                 "\"calves\": [\"test:/1\", \"test:2\"] " +
                 "}";
 
-        final Model rdf = toModel(initial);
+        final Model rdf = toModel(INITIAL);
 
         final Model expected = ModelFactory.createDefaultModel().add(rdf);
 
-        UpdateAction.parseExecute(toTest.toSparql(identitylNoContext, URI.create("http://example.org/farm.jsonld")),
+        UpdateAction.parseExecute(toTest.toSparql(identitylNoContext, URI.create("http://example.org/farm")),
                 rdf);
 
         assertTrue(expected.isIsomorphicWith(rdf));
-    }
-
-    @Test
-    public void noContextProvidedTest() throws Exception {
-        final String noContext = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"] " +
-                "}";
-
-        final Model rdf = ModelFactory.createDefaultModel();
-
-        try {
-            UpdateAction.parseExecute(toTest.toSparql(noContext, null),
-                    rdf);
-            fail("Should have thrown an exception");
-        } catch (final BadRequestException e) {
-            // good;
-        }
     }
 
     @Test
@@ -252,7 +93,7 @@ public class JsonMergePatchTranslatorTest {
                 "\"milkVolume\": 100.6, " +
                 "\"barn\": \"test:/barn\", " +
                 "\"calves\": [\"test:/1\"], " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
+                "\"@context\": \"http://example.org/farm\"" +
                 "}";
 
         final Model existing = ModelFactory.createDefaultModel();
@@ -266,11 +107,30 @@ public class JsonMergePatchTranslatorTest {
 
         assertEquals(1, existing.listStatements(null, hasContext, (RDFNode) null).toList().size());
         assertEquals(1, existing.listStatements(null, hasContext, existing.createResource(
-                "http://example.org/farm.jsonld")).toList().size());
+                "http://example.org/farm")).toList().size());
     }
 
     private Model toModel(String jsonld) {
         return ModelFactory.createDefaultModel().read(new StringReader(nt.translate(jsonld)), null,
                 "NTriples");
+    }
+
+    @Override
+    protected void assertPatch(String jsomMergePatch, String expectedJson) {
+
+        final Model rdf = toModel(INITIAL);
+
+        final Model expected = toModel(expectedJson);
+
+        UpdateAction.parseExecute(toTest.toSparql(jsomMergePatch, null), rdf);
+
+        assertTrue(expected.isIsomorphicWith(rdf));
+    }
+
+    @Override
+    protected void doPatch(String jsonMergePatch) {
+        final Model rdf = toModel(INITIAL);
+        UpdateAction.parseExecute(toTest.toSparql(jsonMergePatch, null), rdf);
+
     }
 }

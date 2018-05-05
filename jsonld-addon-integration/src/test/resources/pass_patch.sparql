@@ -1,0 +1,8 @@
+DELETE {
+?s <http://example.org/pass/name> ?o .
+}
+INSERT {
+<> <http://example.org/pass/name> "moo" .
+<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/pass/Policy> .
+}
+WHERE {?s ?p ?o}

@@ -1,0 +1,8 @@
+<> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/pass/Policy> .
+<> <http://example.org/pass/policyUrl> <https://publicaccess.nih.gov/policy.htm> .
+<> <http://example.org/pass/repositories> <http://WHATEVER:8080/fcrepo/rest/repositories/ce/97/57/09/ce975709-35df-497f-a82d-98f1e8f172b1> .
+<> <http://example.org/pass/funder> <http://WHATEVER:8080/fcrepo/rest/funders/cc/c4/68/bc/ccc468bc-0983-48d7-aa4f-4ab7a45528b1> .
+<> <http://example.org/pass/funder> <http://WHATEVER:8080/fcrepo/rest/funders/46/f9/24/25/46f92425-b0a8-40d9-bb04-567e188ec368> .
+<> <http://example.org/pass/funder> <http://WHATEVER:8080/fcrepo/rest/funders/3d/03/17/2f/3d03172f-59cb-4ae4-b34e-0473ee63c45a> .
+<> <http://example.org/pass/funder> <http://WHATEVER:8080/fcrepo/rest/funders/3b/2d/6f/32/3b2d6f32-d00a-4a35-ab07-4761cc7404f0> .
+<> <http://example.org/pass/title> "National Institute of Health Public Access Policy"^^<http://www.w3.org/2001/XMLSchema#string> .

@@ -17,7 +17,7 @@
 package org.dataconservancy.fcrepo.jsonld.integration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
+import static org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil.assertCompact;
 
 import java.net.URI;
 

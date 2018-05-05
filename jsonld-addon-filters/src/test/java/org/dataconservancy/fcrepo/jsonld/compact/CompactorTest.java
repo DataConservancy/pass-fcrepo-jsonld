@@ -18,13 +18,15 @@ package org.dataconservancy.fcrepo.jsonld.compact;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.addStaticContext;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.assertCompact;
-import static org.dataconservancy.fcrepo.jsonld.compact.JsonldTestUtil.getUncompactedJsonld;
+import static org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil.assertCompact;
+import static org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil.getUncompactedJsonld;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URL;
+
+import org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;

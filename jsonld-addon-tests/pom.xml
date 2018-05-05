@@ -15,7 +15,7 @@
       <artifactId>commons-io</artifactId>
       <version>2.6</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
@@ -27,7 +27,19 @@
       <artifactId>unitils-core</artifactId>
       <version>3.4.6</version>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-core</artifactId>
+      <version>3.6.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-arq</artifactId>
+      <version>3.6.0</version>
+    </dependency>
+
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
