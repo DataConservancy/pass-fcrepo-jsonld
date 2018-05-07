@@ -42,6 +42,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.dataconservancy.fcrepo.jsonld.LogUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +77,9 @@ public class SubstitutionResponseFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        LOG.info("Initializing substitution response filter");
+        LogUtil.adjustLogLevels();
+
         extract(props(), SUBSTITUTION_RESPONSE_HOST)
                 .entrySet().stream().forEach(e -> hosts.put(e.getValue(), e.getKey()));
 

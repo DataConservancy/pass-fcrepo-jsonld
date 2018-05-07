@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.dataconservancy.fcrepo.jsonld.BadRequestException;
 import org.dataconservancy.fcrepo.jsonld.JsonMergePatchTranslator;
+import org.dataconservancy.fcrepo.jsonld.LogUtil;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -68,6 +69,8 @@ public class JsonMergePatchFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        LogUtil.adjustLogLevels();
+
         LOG.info("Initializing JSON Merge Patch Filter");
 
         final JsonLdOptions options = new JsonLdOptions();
@@ -76,11 +79,13 @@ public class JsonMergePatchFilter implements Filter {
 
         boolean strict = false;
         if (getValue(JSONLD_STRICT) != null && !getValue(JSONLD_STRICT).equals("false")) {
+            LOG.info("Using strict JSON-LD");
             strict = true;
         }
 
         boolean persistContexts = false;
         if (getValue(JSONLD_PERSIST_CONTEXT) != null && !getValue(JSONLD_PERSIST_CONTEXT).equals("false")) {
+            LOG.info("Will persist PATCHed context");
             persistContexts = true;
         }
 
@@ -98,7 +103,9 @@ public class JsonMergePatchFilter implements Filter {
         final String contentType = Optional.ofNullable(req.getHeader(
                 "content-type")).orElse(Optional.ofNullable(req.getContentType()).orElse(""));
 
+        LOG.debug("Looking at request");
         if ("PATCH".equals(method) && contentType.contains(JSON_MERGE_PATCH)) {
+            LOG.debug("Handling PATCH");
             try {
                 chain.doFilter(new JsonMergePatchWrapper(req), new JsonMergePatchResponseWrapper(resp));
             } catch (final BadRequestException e) {
@@ -109,6 +116,7 @@ public class JsonMergePatchFilter implements Filter {
                 LOG.warn("Bad request", e);
             }
         } else {
+            LOG.debug("Not a json merge patch, ignoring");
             chain.doFilter(request, new JsonMergePatchResponseWrapper(resp));
         }
     }
@@ -127,10 +135,12 @@ public class JsonMergePatchFilter implements Filter {
         public JsonMergePatchWrapper(HttpServletRequest request) {
             super(request);
             try (InputStream origInput = super.getInputStream()) {
-                final String sparql = translator.toSparql(IOUtils.toString(origInput, UTF_8), null);
+                final String input = IOUtils.toString(origInput, UTF_8);
+                LOG.debug("Got input JSON patch:\n{}", input);
+                final String sparql = translator.toSparql(input, null);
 
                 final byte[] sparqlBody = sparql.getBytes(UTF_8);
-                LOG.debug("Translated to sparql/update: " + sparql);
+                LOG.debug("Translated to sparql/update:\n " + sparql);
                 length = sparqlBody.length;
                 translated = new ByteArrayInputStream(sparqlBody);
             } catch (final IOException e) {

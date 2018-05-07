@@ -57,7 +57,7 @@ class Compactor {
 
     private final int OBJECT = 2;
 
-    private static final List<String> INTERNAL_ATTRS = Arrays.asList("@id", "@type");
+    private static final List<String> INTERNAL_ATTRS = Arrays.asList("@id", "@type", "@graph");
 
     public Compactor(JsonLdOptions options, boolean limitCompaction, boolean usePersistedContext) {
         this.options = options;
@@ -81,6 +81,7 @@ class Compactor {
             if (usePersistedContext) {
                 contextUri = findPersistedContext(jsonld, defaultContext);
             } else {
+                LOG.debug("Using default context: {}", defaultContext.toExternalForm());
                 contextUri = defaultContext.toExternalForm();
             }
 
@@ -90,6 +91,7 @@ class Compactor {
                     JsonLdProcessor.compact(fromString(jsonld), cxt, options));
 
             if (limitCompaction) {
+                LOG.debug("Limiting response to attributes defined in context {}", contextUri);
                 return stripAttrsNotDefinedInContext(compacted, contextUri, cxt.get("@context"));
             }
 
@@ -101,15 +103,17 @@ class Compactor {
 
     private String findPersistedContext(String jsonld, URL defaultContext) {
         for (final String triple : translator.translate(jsonld).split("\n")) {
-            final String[] spo = triple.split(" ");
-            if (spo[PREDICATE].contains(PREDICATE_HAS_CONTEXT)) {
-                final String context = spo[OBJECT].substring(1, spo[OBJECT].indexOf('>'));
-                LOG.debug("Found persisted context {}", context);
-                return context;
+            if (triple.contains("<" + PREDICATE_HAS_CONTEXT + ">")) {
+                final String[] spo = triple.split(" ");
+                if (spo[PREDICATE].contains(PREDICATE_HAS_CONTEXT)) {
+                    final String context = spo[OBJECT].substring(1, spo[OBJECT].indexOf('>'));
+                    LOG.debug("Found persisted context {}", context);
+                    return context;
+                }
             }
         }
 
-        LOG.info("Did not find persistent context, using default");
+        LOG.info("Did not find persistent context, using default: {}", defaultContext.toExternalForm());
         return defaultContext.toExternalForm();
     }
 
@@ -131,10 +135,14 @@ class Compactor {
 
         // TODO: Handle aliasing at some point
         if (parsedJson.get("@type") instanceof List) {
+            LOG.debug("Strip context: Found multiple RDF types, looking to see which one is in context");
             final List<String> types = new ArrayList<>();
             for (final String value : (List<String>) parsedJson.get("@type")) {
                 if (attrs.containsKey(value)) {
+                    LOG.debug("Matched type {} to context", value);
                     types.add(value);
+                } else {
+                    LOG.debug("Discarding rdf type {}" + value);
                 }
             }
 

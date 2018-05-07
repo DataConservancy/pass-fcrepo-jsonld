@@ -22,6 +22,7 @@ import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.getValue;
 import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.loadContexts;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -39,6 +40,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+
+import org.dataconservancy.fcrepo.jsonld.LogUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +67,7 @@ public class CompactionFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        LogUtil.adjustLogLevels();
 
         LOG.info("Initializing compaction filter");
 
@@ -96,7 +100,6 @@ public class CompactionFilter implements Filter {
         }
 
         compactor = new Compactor(options, limitContexts, usePersistedContext);
-        rawCompactor = new Compactor(options, false, false);
     }
 
     @Override
@@ -117,28 +120,25 @@ public class CompactionFilter implements Filter {
             accept = String.join(",", Collections.list(req.getHeaders("accept")));
         }
 
-        // Hack to allow ember adapter to be happy for findAll
-        boolean useRawCompaction = false;
-        if (Optional.ofNullable(req.getHeader("Prefer")).orElse("").contains("embed")) {
-            useRawCompaction = true;
-        }
+        try {
+            if (method.equalsIgnoreCase("GET") && (accept.contains("application/ld+json") || accept.equals(""))) {
 
-        if (method.equalsIgnoreCase("GET") && (accept.contains("application/ld+json") || accept.equals(""))) {
-
-            LOG.debug("Compaction filter is compacting");
-            final CompactionWrapper compactionWrapper;
-            if (useRawCompaction) {
-                compactionWrapper = new CompactionWrapper(resp, rawCompactor, defaultContext);
-            } else {
-                compactionWrapper = new CompactionWrapper(resp,
+                LOG.debug("Compaction filter is compacting");
+                final CompactionWrapper compactionWrapper = new CompactionWrapper(resp,
                         compactor,
                         defaultContext);
+                chain.doFilter(new CompactionRequestWrapper(req), compactionWrapper);
+                compactionWrapper.getOutputStream().close();
+            } else {
+                LOG.debug("Compaction filter is doing nothing");
+                chain.doFilter(request, response);
             }
-            chain.doFilter(new CompactionRequestWrapper(req), compactionWrapper);
-            compactionWrapper.getOutputStream().close();
-        } else {
-            LOG.debug("Compaction filter is doing nothing");
-            chain.doFilter(request, response);
+        } catch (final Exception e) {
+            LOG.warn("Internal error", e);
+            resp.setStatus(500);
+            try (Writer out = resp.getWriter()) {
+                out.write("Internal error: " + e.getMessage());
+            }
         }
     }
 

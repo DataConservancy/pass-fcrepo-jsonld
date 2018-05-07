@@ -46,7 +46,6 @@ class CompactionWrapper extends HttpServletResponseWrapper {
 
         try {
             delegate = super.getOutputStream();
-            LOG.debug("Delegate output stream is " + delegate);
             compactingOutputStream = new CompactingOutputStream(delegate, compactor, context);
         } catch (final IOException e) {
             throw new RuntimeException("Could not open response output stream", e);

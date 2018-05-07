@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.dataconservancy.fcrepo</groupId>
     <artifactId>jsonld-addon</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
   </parent>
   <artifactId>jsonld-addon-integration</artifactId>
 
@@ -96,6 +96,7 @@
             <type>installed</type>
             <timeout>1200000</timeout>
             <systemProperties>
+              <LOG.org.dataconservancy.fcrepo.jsonld>DEBUG</LOG.org.dataconservancy.fcrepo.jsonld>
               <compaction.uri>${compaction.uri}</compaction.uri>
               <compaction.preload.uri.farm>${compaction.preload.uri.farm}</compaction.preload.uri.farm>
               <compaction.preload.file.farm>${compaction.preload.file.farm}</compaction.preload.file.farm>
@@ -112,14 +113,6 @@
                 <groupId>org.dataconservancy.fcrepo</groupId>
                 <artifactId>jsonld-addon-filters</artifactId>
                 <classifier>shaded</classifier>
-              </dependency>
-              <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-              </dependency>
-              <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-jdk14</artifactId>
               </dependency>
             </dependencies>
           </container>
@@ -185,9 +178,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk14</artifactId>
-      <version>1.7.25</version>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
       <scope>test</scope>
     </dependency>
 

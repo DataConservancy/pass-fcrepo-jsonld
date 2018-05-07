@@ -27,14 +27,22 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import org.dataconservancy.fcrepo.jsonld.LogUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author apb@jhu.edu
  */
 public class UriProtocolFilter implements Filter {
 
+    Logger LOG = LoggerFactory.getLogger(UriProtocolFilter.class);
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        // Nothing to do
+        LogUtil.adjustLogLevels();
+
     }
 
     @Override
@@ -46,6 +54,7 @@ public class UriProtocolFilter implements Filter {
         final Protocol proto = Protocol.of(req);
 
         if (proto.isDefined()) {
+            LOG.debug("Using forwarded protocol {}", proto.getProtocol());
             chain.doFilter(new HttpServletRequestWrapper((HttpServletRequest) request) {
 
                 @Override
@@ -55,6 +64,7 @@ public class UriProtocolFilter implements Filter {
                 }
             }, response);
         } else {
+            LOG.debug("No forwarded protocol, ignoring");
             chain.doFilter(request, response);
         }
     }

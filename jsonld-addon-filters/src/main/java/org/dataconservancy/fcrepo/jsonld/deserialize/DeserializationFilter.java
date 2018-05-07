@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.dataconservancy.fcrepo.jsonld.BadRequestException;
 import org.dataconservancy.fcrepo.jsonld.JsonldNtriplesTranslator;
+import org.dataconservancy.fcrepo.jsonld.LogUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,8 @@ public class DeserializationFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        LogUtil.adjustLogLevels();
+
         LOG.info("Initializing JSON-LD deserialiation");
 
         final JsonLdOptions options = new JsonLdOptions();

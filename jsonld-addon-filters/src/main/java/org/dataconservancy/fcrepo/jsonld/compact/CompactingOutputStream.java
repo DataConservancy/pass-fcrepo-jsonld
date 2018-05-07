@@ -84,9 +84,9 @@ public class CompactingOutputStream extends FilterOutputStream {
 
         try {
             if (compactionEnabled && context != null) {
-                LOG.debug("Doing compaction and writing to {}, which is a {}", super.out, super.out.getClass());
+                LOG.debug("Going to compact raw input:\n {}", new String(captured.toByteArray()));
                 final String compacted = compactor.compact(new String(captured.toByteArray(), UTF_8), context);
-                LOG.debug("Writing compacted jsonld: {}", compacted);
+                LOG.debug("Returning compacted jsonld: {}", compacted);
                 super.out.write(compacted.getBytes(UTF_8));
             } else {
                 LOG.debug("Not doing compaction");

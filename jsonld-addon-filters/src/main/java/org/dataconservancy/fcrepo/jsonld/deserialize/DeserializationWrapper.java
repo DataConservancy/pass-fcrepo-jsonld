@@ -62,10 +62,10 @@ class DeserializationWrapper extends HttpServletRequestWrapper {
 
                 final String originalBody = IOUtils.toString(
                         originalInputStream, UTF_8);
-                LOG.debug("Original content: " + originalBody);
+                LOG.debug("Original content:\n" + originalBody);
 
                 final String translatedBody = transltor.translate(originalBody);
-                LOG.debug("Translated content: " + translatedBody);
+                LOG.debug("Translated content:\b" + translatedBody);
                 translatedOutputStream = new ByteArrayInputStream(translatedBody.getBytes(UTF_8));
 
             }

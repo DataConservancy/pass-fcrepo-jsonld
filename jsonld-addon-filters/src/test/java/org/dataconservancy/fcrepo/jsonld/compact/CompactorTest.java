@@ -95,4 +95,11 @@ public class CompactorTest {
         assertTrue(results.contains(MY_CONTEXT.toExternalForm()));
         assertFalse(results.contains(CONTEXT_URL.toExternalForm()));
     }
+
+    @Test
+    public void emptyInputTest() {
+        final Compactor toTest = new Compactor(options, true, true);
+
+        toTest.compact("[]", CONTEXT_URL);
+    }
 }
