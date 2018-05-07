@@ -8,6 +8,18 @@
 
 ## Configuration
 
+### Logging
+
+System properties or environment variables that start with `LOG` can be used to adjust logging levels, with the form `LOG.logger.name=LEVEL`, e.g. `LOG.org.dataconservancy=DEBUG`
+
+1. You may define an environment variable for a logger of your choice (e.g. `org.dataconservancy.jsonld`).  Underscores may be used in place of periods
+
+       export LOG_ORG_DATACONSERVANCY_JSONLD=DEBUG
+    
+2. You may define a system property that does the same
+
+       -Dlog.org.dataconservancy.jsonld=DEBUG
+
 ### Static Loaded Contexts
 
 Context URIs can be mapped to a files to pre-load contexts so that they can be used/cached without requiring resolution on the internet.  As many contexts as desired can be loaded using the following pattern for a given arbitrary context name `NAME`.  Define system properties or environment varlables as follows:
@@ -50,13 +62,13 @@ When deserializing json-ld, normally unknown JSON attributes are ignored.  This 
 
 When returning json-ld in compact form, when this is set the server will omit any properties that aren't mapped to anything in the context.
 
-1. Define an environment variable `JSONLD_MINIMAL_CONTEXT`
+1. Define an environment variable `JSONLD_CONTEXT_MINIMAL`
 
-       export JSONLD_MINIMAL CONTEXT=true
+       export JSONLD_CONTEXT_MINIMAL=true
 
-2. Define a system property `jsonld.minimal.context`
+2. Define a system property `jsonld.context.minimal`
 
-       -Djsonld.minimal.context=true
+       -Djsonld.context.minimal=true
 
 ### Persisted contexts
 
@@ -66,6 +78,6 @@ This will cause the original jsonld context URI to be persisted in the repositor
 
        export JSONLD_CONTEXT_PERSIST=true
 
-2. Define a system property `jsonld.minimal.context`
+2. Define a system property `jsonld.context.persist`
 
        -Djsonld.context.persist=true
