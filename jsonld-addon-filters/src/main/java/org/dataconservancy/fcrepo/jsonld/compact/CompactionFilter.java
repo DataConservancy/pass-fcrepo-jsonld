@@ -109,27 +109,13 @@ public class CompactionFilter implements Filter {
 
         LOG.debug("Compaction filter is considering response");
 
-        final String method = req.getMethod();
-
-        final String accept;
-        if (req.getHeaders("accept") == null) {
-            accept = "application/ld+json";
-        } else {
-            accept = String.join(",", Collections.list(req.getHeaders("accept")));
-        }
-
         try {
-            if (accept.contains("application/ld+json") || (method.equalsIgnoreCase("GET") && accept.equals(""))) {
-                LOG.debug("Compaction filter will examine response");
-                final CompactionWrapper compactionWrapper = new CompactionWrapper(resp,
-                        compactor,
-                        defaultContext);
-                chain.doFilter(new CompactionRequestWrapper(req), compactionWrapper);
-                compactionWrapper.getOutputStream().close();
-            } else {
-                LOG.debug("Compaction filter is doing nothing");
-                chain.doFilter(request, response);
-            }
+            LOG.debug("Compaction filter will examine response");
+            final CompactionWrapper compactionWrapper = new CompactionWrapper(resp,
+                    compactor,
+                    defaultContext);
+            chain.doFilter(new CompactionRequestWrapper(req), compactionWrapper);
+            compactionWrapper.getOutputStream().close();
         } catch (final Exception e) {
             LOG.warn("Internal error", e);
             resp.setStatus(500);
@@ -148,17 +134,23 @@ public class CompactionFilter implements Filter {
 
         @Override
         public String getHeader(String name) {
+            final String orig = super.getHeader(name);
             if (name.equalsIgnoreCase("accept")) {
-                return "application/ld+json";
+                if (orig == null || orig.equals("") || orig.equals("*/*")) {
+                    final String accepts = "application/ld+json, */*";
+                    LOG.debug("Transforming original accept header {} into  {}", orig, accepts);
+                    return accepts;
+                }
+                return orig;
             } else {
-                return super.getHeader(name);
+                return orig;
             }
         }
 
         @Override
         public Enumeration<String> getHeaders(String name) {
             if (name.equalsIgnoreCase("accept")) {
-                return Collections.enumeration(Arrays.asList("application/ld+json"));
+                return Collections.enumeration(Arrays.asList(getHeader("accept")));
             } else {
                 return super.getHeaders(name);
             }
