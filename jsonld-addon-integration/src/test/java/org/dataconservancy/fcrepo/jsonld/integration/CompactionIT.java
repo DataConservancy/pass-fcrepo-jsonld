@@ -18,7 +18,9 @@ package org.dataconservancy.fcrepo.jsonld.integration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil.assertCompact;
+import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.net.URI;
 
 import org.fcrepo.client.FcrepoClient;
@@ -26,12 +28,21 @@ import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
 import org.fcrepo.client.FcrepoResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 
 /**
  * @author apb@jhu.edu
  */
 public class CompactionIT implements FcrepoIT {
+
+    CloseableHttpClient client = HttpClients.createDefault();
 
     @Test
     public void compactionTest() throws Exception {
@@ -53,6 +64,32 @@ public class CompactionIT implements FcrepoIT {
 
             final String body = IOUtils.toString(response.getBody(), UTF_8);
             assertCompact(body);
+        }
+    }
+
+    @Test
+    public void compactionPostTest() throws Exception {
+        final HttpPost post = new HttpPost(URI.create(fcrepoBaseURI));
+        post.setEntity(new InputStreamEntity(this.getClass().getResourceAsStream("/compact-uri.json"), ContentType
+                .create("application/ld+json")));
+        post.setHeader("Accept", "application/ld+json");
+        post.setHeader("Prefer", "return=representation");
+
+        assertCompact(client.execute(post, r -> {
+            assertSuccess(r);
+            return EntityUtils.toString(r.getEntity());
+        }));
+
+    }
+
+    static void assertSuccess(HttpResponse response) {
+        if (response.getStatusLine().getStatusCode() > 299) {
+            try {
+                final String message = EntityUtils.toString(response.getEntity());
+                fail("Http request failed: " + response.getStatusLine() + "; " + message);
+            } catch (final IOException e) {
+                fail("Http request failed: " + response.getStatusLine());
+            }
         }
     }
 }

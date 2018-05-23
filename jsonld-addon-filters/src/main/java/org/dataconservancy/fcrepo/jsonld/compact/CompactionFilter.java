@@ -61,8 +61,6 @@ public class CompactionFilter implements Filter {
 
     private Compactor compactor;
 
-    private Compactor rawCompactor;
-
     Logger LOG = LoggerFactory.getLogger(CompactionFilter.class);
 
     @Override
@@ -121,9 +119,8 @@ public class CompactionFilter implements Filter {
         }
 
         try {
-            if (method.equalsIgnoreCase("GET") && (accept.contains("application/ld+json") || accept.equals(""))) {
-
-                LOG.debug("Compaction filter is compacting");
+            if (accept.contains("application/ld+json") || (method.equalsIgnoreCase("GET") && accept.equals(""))) {
+                LOG.debug("Compaction filter will examine response");
                 final CompactionWrapper compactionWrapper = new CompactionWrapper(resp,
                         compactor,
                         defaultContext);

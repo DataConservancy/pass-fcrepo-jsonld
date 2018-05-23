@@ -75,7 +75,6 @@ public class CompactionFilterTest {
 
     final String PRELOAD_FILE_PROP = join(".", COMPACTION_PROP_PRELOAD_FILES, "farm.filter.test");
 
-    @SuppressWarnings("resource")
     @Before
     public void setUp() throws Exception {
         this.originalOutIsClosed = false;
@@ -104,7 +103,6 @@ public class CompactionFilterTest {
         };
 
         when(originalResponse.getOutputStream()).thenReturn(servletOut);
-        when(originalRequest.getMethod()).thenReturn("GET");
 
         chain = new FilterChain() {
 
