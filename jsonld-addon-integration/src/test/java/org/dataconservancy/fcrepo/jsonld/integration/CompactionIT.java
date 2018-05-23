@@ -18,6 +18,7 @@ package org.dataconservancy.fcrepo.jsonld.integration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil.assertCompact;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -80,6 +81,26 @@ public class CompactionIT implements FcrepoIT {
             return EntityUtils.toString(r.getEntity());
         }));
 
+    }
+
+    @Test
+    public void httpHeadTest() throws Exception {
+        final FcrepoClient client = new FcrepoClientBuilder().throwExceptionOnFailure().build();
+
+        final URI jsonldResource = attempt(60, () -> {
+            try (FcrepoResponse response = client
+                    .post(URI.create(fcrepoBaseURI))
+                    .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
+                    .perform()) {
+                return response.getLocation();
+            }
+        });
+
+        try (FcrepoResponse response = client
+                .head(jsonldResource)
+                .perform()) {
+            assertFalse(response.getLinkHeaders("type").isEmpty());
+        }
     }
 
     static void assertSuccess(HttpResponse response) {

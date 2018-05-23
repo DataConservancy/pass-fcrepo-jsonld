@@ -83,7 +83,7 @@ public class CompactingOutputStream extends FilterOutputStream {
     public void close() throws IOException {
 
         try {
-            if (compactionEnabled && context != null) {
+            if (compactionEnabled && context != null && captured.size() > 0) {
                 LOG.debug("Going to compact raw input:\n {}", new String(captured.toByteArray()));
                 final String compacted = compactor.compact(new String(captured.toByteArray(), UTF_8), context);
                 LOG.debug("Returning compacted jsonld: {}", compacted);
