@@ -7,6 +7,54 @@
   <version>0.0.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <name>Fcrepo jsonld addons</name>
+  <description>JSON-LD addons for Fedora</description>
+  <url>https://github.com/DataConservancy/fcrepo-jsonld</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Aaron Birkland</name>
+      <email>apb@jhu.edu</email>
+      <organization>The Sheridan Libraries, Johns Hopkins Univeristy</organization>
+      <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
+    </developer>
+    <developer>
+      <name>Karen Hanson</name>
+      <email>karen.hanson@jhu.edu</email>
+      <organization>The Sheridan Libraries, Johns Hopkins Univeristy</organization>
+      <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
+    </developer>
+    <developer>
+      <name>Jim Martino</name>
+      <email>jrm.jhu@jhu.edu</email>
+      <organization>The Sheridan Libraries, Johns Hopkins Univeristy</organization>
+      <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
+    </developer>
+    <developer>
+      <name>Elliot Metsger</name>
+      <email>emetsger@jhu.edu</email>
+      <organization>The Sheridan Libraries, Johns Hopkins Univeristy</organization>
+      <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
+    </developer>
+    <developer>
+      <name>Mark Patton</name>
+      <email>mpatton@jhu.edu</email>
+      <organization>The Sheridan Libraries, Johns Hopkins Univeristy</organization>
+      <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
+    </developer>
+    <developer>
+      <name>Hanh Vu</name>
+      <email>hanh.vu@jhu.edu</email>
+      <organization>The Sheridan Libraries, Johns Hopkins Univeristy</organization>
+      <organizationUrl>https://www.library.jhu.edu/</organizationUrl>
+    </developer>
+  </developers>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -45,6 +93,20 @@
     <maven.wagon.ssh.version>3.2.0</maven.wagon.ssh.version>
 
   </properties>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <build>
     <pluginManagement>
@@ -255,11 +317,21 @@
   </dependencyManagement>
 
   <distributionManagement>
+    <repository>
+      <id>maven-central-staging</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
     <snapshotRepository>
       <id>ossrh</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
+
+  <scm>
+    <connection>scm:git:https://github.com/DataConservancy/fcrepo-jsonld.git</connection>
+    <developerConnection>scm:git:https://github.com/DataConservancy/fcrepo-jsonld.git</developerConnection>
+    <url>https://github.com/DataConservancy/fcrepo-jsonld</url>
+  </scm>
 
   <modules>
     <module>jsonld-addon-filters</module>
