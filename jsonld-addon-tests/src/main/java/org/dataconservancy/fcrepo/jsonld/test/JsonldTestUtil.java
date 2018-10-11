@@ -28,12 +28,19 @@ import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 /**
+ * JSONLD test utils
+ * 
  * @author apb@jhu.edu
  */
 public class JsonldTestUtil {
 
     final static Map<String, Object> compacted = Collections.unmodifiableMap(getCompacted());
 
+    /**
+     * Get uncompacted jsonld for test purposes.
+     *
+     * @return uncompacted jsonld
+     */
     public static String getUncompactedJsonld() {
         try {
             return IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
@@ -43,6 +50,11 @@ public class JsonldTestUtil {
         }
     }
 
+    /**
+     * Assert the given jsonld is compact.
+     *
+     * @param jsonld The jsonld
+     */
     public static void assertCompact(String jsonld) {
         final Map<String, Object> testJson = redact(new JSONObject(jsonld).toMap());
 
