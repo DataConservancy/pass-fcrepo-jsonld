@@ -25,7 +25,7 @@
     <dependency>
       <groupId>org.unitils</groupId>
       <artifactId>unitils-core</artifactId>
-      <version>3.4.6</version>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -43,7 +43,12 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
