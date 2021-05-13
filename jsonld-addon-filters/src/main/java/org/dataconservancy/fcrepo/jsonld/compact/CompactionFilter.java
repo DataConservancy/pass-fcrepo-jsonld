@@ -45,6 +45,7 @@ import org.dataconservancy.fcrepo.jsonld.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jsonldjava.core.JsonLdOptions;
@@ -57,6 +58,8 @@ import com.github.jsonldjava.core.JsonLdOptions;
 public class CompactionFilter implements Filter {
 
     public static final String CONTEXT_COMPACTION_URI_PROP = "compaction.uri";
+
+    private static final String JSONLD_VALUE_FIELD = "@value";
 
     private URL defaultContext;
 
@@ -117,18 +120,32 @@ public class CompactionFilter implements Filter {
                     defaultContext);
             chain.doFilter(new CompactionRequestWrapper(req), compactionWrapper);
 
-            if (compactionWrapper.compactingOutputStream.compactionEnabled) {
-                LOG.warn(new String(compactionWrapper.compactingOutputStream.captured.toByteArray()));
-                ObjectNode rawJson = new ObjectMapper()
-                        .readValue(compactionWrapper.compactingOutputStream.captured.toByteArray(), ObjectNode.class);
+            if (compactionWrapper.compactingOutputStream.compactionEnabled
+                    && compactionWrapper.compactingOutputStream.captured.size() > 0) {
+                ObjectNode rawJson = asObject(new ObjectMapper()
+                        .readValue(compactionWrapper.compactingOutputStream.captured.toByteArray(), JsonNode.class));
+
+                ObjectNode lastModified = asObject(
+                        rawJson.get("http://fedora.info/definitions/v4/repository#lastModified"));
+                ObjectNode created = asObject(rawJson.get("http://fedora.info/definitions/v4/repository#created"));
+
+                if (created.has(JSONLD_VALUE_FIELD)) {
+                    resp.addHeader("X-CREATED", created.get(JSONLD_VALUE_FIELD).asText());
+                }
+
+                if (lastModified.has(JSONLD_VALUE_FIELD)) {
+                    resp.addHeader("X-MODIFIED", lastModified.get(JSONLD_VALUE_FIELD).asText());
+                }
             }
 
-            compactionWrapper.getOutputStream().close();
+            compactionWrapper.compactingOutputStream.close();
         } catch (final Exception e) {
             LOG.warn("Internal error", e);
             resp.setStatus(500);
             try (Writer out = resp.getWriter()) {
                 out.write("Internal error: " + e.getMessage());
+            } catch (Exception x) {
+                // nothing
             }
         }
     }
@@ -181,5 +198,12 @@ public class CompactionFilter implements Filter {
     @Override
     public void destroy() {
         // nothing
+    }
+
+    private static ObjectNode asObject(JsonNode n) {
+        if (n != null && n.isArray()) {
+            return (ObjectNode) n.get(0);
+        }
+        return (ObjectNode) n;
     }
 }
