@@ -42,10 +42,11 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dataconservancy.fcrepo.jsonld.LogUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jsonldjava.core.JsonLdOptions;
 
 /**
@@ -102,7 +103,7 @@ public class CompactionFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
+    ServletException {
 
         final HttpServletRequest req = (HttpServletRequest) request;
         final HttpServletResponse resp = (HttpServletResponse) response;
@@ -115,6 +116,13 @@ public class CompactionFilter implements Filter {
                     compactor,
                     defaultContext);
             chain.doFilter(new CompactionRequestWrapper(req), compactionWrapper);
+
+            if (compactionWrapper.compactingOutputStream.compactionEnabled) {
+                LOG.warn(new String(compactionWrapper.compactingOutputStream.captured.toByteArray()));
+                ObjectNode rawJson = new ObjectMapper()
+                        .readValue(compactionWrapper.compactingOutputStream.captured.toByteArray(), ObjectNode.class);
+            }
+
             compactionWrapper.getOutputStream().close();
         } catch (final Exception e) {
             LOG.warn("Internal error", e);

@@ -43,11 +43,11 @@ public class CompactingOutputStream extends FilterOutputStream {
 
     final Compactor compactor;
 
-    private boolean compactionEnabled = false;
+    boolean compactionEnabled = false;
 
     private final URL context;
 
-    private final ByteArrayOutputStream captured = new ByteArrayOutputStream();
+    final ByteArrayOutputStream captured = new ByteArrayOutputStream();
 
     /**
      * Wrap the given OutputStream with the given compactor and context URL.
