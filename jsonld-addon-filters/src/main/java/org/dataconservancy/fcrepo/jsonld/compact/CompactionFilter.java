@@ -51,7 +51,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jsonldjava.core.JsonLdOptions;
 
 /**
- * Servlet filter which compacts responses according to
+ * Servlet filter which compacts responses according to configured context.
  *
  * @author apb@jhu.edu
  */
@@ -125,16 +125,41 @@ public class CompactionFilter implements Filter {
                 ObjectNode rawJson = asObject(new ObjectMapper()
                         .readValue(compactionWrapper.compactingOutputStream.captured.toByteArray(), JsonNode.class));
 
-                ObjectNode lastModified = asObject(
-                        rawJson.get("http://fedora.info/definitions/v4/repository#lastModified"));
-                ObjectNode created = asObject(rawJson.get("http://fedora.info/definitions/v4/repository#created"));
+                String lastModified = null;
+                String created = null;
 
-                if (created.has(JSONLD_VALUE_FIELD)) {
-                    resp.addHeader("X-CREATED", created.get(JSONLD_VALUE_FIELD).asText());
+                // Put created and last modified properties into headers.
+                // Must check for compact and expanded JSON-LD properties.
+
+                ObjectNode lastModifiedObject = asObject(rawJson.get("http://fedora.info/definitions/v4/repository#lastModified"));
+                ObjectNode createdObject = asObject(rawJson.get("http://fedora.info/definitions/v4/repository#created"));
+
+                if (lastModifiedObject == null) {
+                    if (rawJson.has("lastModified")) {
+                        lastModified = rawJson.get("lastModified").asText();
+                    }
+                } else {
+                    if (lastModifiedObject.has(JSONLD_VALUE_FIELD)) {
+                        lastModified = lastModifiedObject.get(JSONLD_VALUE_FIELD).asText();
+                    }
                 }
 
-                if (lastModified.has(JSONLD_VALUE_FIELD)) {
-                    resp.addHeader("X-MODIFIED", lastModified.get(JSONLD_VALUE_FIELD).asText());
+                if (createdObject == null) {
+                    if (rawJson.has("created")) {
+                        created = rawJson.get("created").asText();
+                    }
+                } else {
+                    if (createdObject.has(JSONLD_VALUE_FIELD)) {
+                        created = createdObject.get(JSONLD_VALUE_FIELD).asText();
+                    }
+                }
+
+                if (created != null) {
+                    resp.addHeader("X-CREATED", created);
+                }
+
+                if (lastModified != null) {
+                    resp.addHeader("X-MODIFIED", lastModified);
                 }
             }
 
@@ -167,6 +192,14 @@ public class CompactionFilter implements Filter {
                     return accepts;
                 }
                 return orig;
+            } else if (name.equalsIgnoreCase("prefer")) {
+                // Ignore requests to modify representation since this filter overriding them.
+                if (orig != null && orig.startsWith("return=representation;")) {
+                    final String prefers = "return=representation";
+                    LOG.debug("Transforming original prefer header {} into  {}", orig, prefers);
+                    return prefers;
+                }
+                return orig;
             } else {
                 return orig;
             }
@@ -176,6 +209,8 @@ public class CompactionFilter implements Filter {
         public Enumeration<String> getHeaders(String name) {
             if (name.equalsIgnoreCase("accept")) {
                 return Collections.enumeration(Arrays.asList(getHeader("accept")));
+            } else if (name.equalsIgnoreCase("prefer")) {
+                return Collections.enumeration(Arrays.asList(getHeader("prefer")));
             } else {
                 return super.getHeaders(name);
             }
