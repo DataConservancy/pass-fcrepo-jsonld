@@ -42,20 +42,24 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dataconservancy.fcrepo.jsonld.LogUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jsonldjava.core.JsonLdOptions;
 
 /**
- * Servlet filter which compacts responses according to
+ * Servlet filter which compacts responses according to configured context.
  *
  * @author apb@jhu.edu
  */
 public class CompactionFilter implements Filter {
 
     public static final String CONTEXT_COMPACTION_URI_PROP = "compaction.uri";
+
+    private static final String JSONLD_VALUE_FIELD = "@value";
 
     private URL defaultContext;
 
@@ -102,7 +106,7 @@ public class CompactionFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
+    ServletException {
 
         final HttpServletRequest req = (HttpServletRequest) request;
         final HttpServletResponse resp = (HttpServletResponse) response;
@@ -115,12 +119,58 @@ public class CompactionFilter implements Filter {
                     compactor,
                     defaultContext);
             chain.doFilter(new CompactionRequestWrapper(req), compactionWrapper);
-            compactionWrapper.getOutputStream().close();
+
+            if (compactionWrapper.compactingOutputStream.compactionEnabled
+                    && compactionWrapper.compactingOutputStream.captured.size() > 0) {
+                ObjectNode rawJson = asObject(new ObjectMapper()
+                        .readValue(compactionWrapper.compactingOutputStream.captured.toByteArray(), JsonNode.class));
+
+                String lastModified = null;
+                String created = null;
+
+                // Put created and last modified properties into headers.
+                // Must check for compact and expanded JSON-LD properties.
+
+                ObjectNode lastModifiedObject = asObject(rawJson.get("http://fedora.info/definitions/v4/repository#lastModified"));
+                ObjectNode createdObject = asObject(rawJson.get("http://fedora.info/definitions/v4/repository#created"));
+
+                if (lastModifiedObject == null) {
+                    if (rawJson.has("lastModified")) {
+                        lastModified = rawJson.get("lastModified").asText();
+                    }
+                } else {
+                    if (lastModifiedObject.has(JSONLD_VALUE_FIELD)) {
+                        lastModified = lastModifiedObject.get(JSONLD_VALUE_FIELD).asText();
+                    }
+                }
+
+                if (createdObject == null) {
+                    if (rawJson.has("created")) {
+                        created = rawJson.get("created").asText();
+                    }
+                } else {
+                    if (createdObject.has(JSONLD_VALUE_FIELD)) {
+                        created = createdObject.get(JSONLD_VALUE_FIELD).asText();
+                    }
+                }
+
+                if (created != null) {
+                    resp.addHeader("X-CREATED", created);
+                }
+
+                if (lastModified != null) {
+                    resp.addHeader("X-MODIFIED", lastModified);
+                }
+            }
+
+            compactionWrapper.compactingOutputStream.close();
         } catch (final Exception e) {
             LOG.warn("Internal error", e);
             resp.setStatus(500);
             try (Writer out = resp.getWriter()) {
                 out.write("Internal error: " + e.getMessage());
+            } catch (Exception x) {
+                // nothing
             }
         }
     }
@@ -142,6 +192,14 @@ public class CompactionFilter implements Filter {
                     return accepts;
                 }
                 return orig;
+            } else if (name.equalsIgnoreCase("prefer")) {
+                // Ignore requests to modify representation since this filter overriding them.
+                if (orig != null && orig.startsWith("return=representation;")) {
+                    final String prefers = "return=representation";
+                    LOG.debug("Transforming original prefer header {} into  {}", orig, prefers);
+                    return prefers;
+                }
+                return orig;
             } else {
                 return orig;
             }
@@ -151,6 +209,8 @@ public class CompactionFilter implements Filter {
         public Enumeration<String> getHeaders(String name) {
             if (name.equalsIgnoreCase("accept")) {
                 return Collections.enumeration(Arrays.asList(getHeader("accept")));
+            } else if (name.equalsIgnoreCase("prefer")) {
+                return Collections.enumeration(Arrays.asList(getHeader("prefer")));
             } else {
                 return super.getHeaders(name);
             }
@@ -173,5 +233,12 @@ public class CompactionFilter implements Filter {
     @Override
     public void destroy() {
         // nothing
+    }
+
+    private static ObjectNode asObject(JsonNode n) {
+        if (n != null && n.isArray()) {
+            return (ObjectNode) n.get(0);
+        }
+        return (ObjectNode) n;
     }
 }

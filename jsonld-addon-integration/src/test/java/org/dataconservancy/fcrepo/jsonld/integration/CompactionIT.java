@@ -19,10 +19,12 @@ package org.dataconservancy.fcrepo.jsonld.integration;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil.assertCompact;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 
 import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
@@ -65,6 +67,61 @@ public class CompactionIT implements FcrepoIT {
 
             final String body = IOUtils.toString(response.getBody(), UTF_8);
             assertCompact(body);
+
+            assertNotNull(response.getHeaderValue("X-CREATED"));
+            assertNotNull(response.getHeaderValue("X-MODIFIED"));
+        }
+    }
+
+    @Test
+    public void compactionTestWithAcceptCompact() throws Exception {
+        final FcrepoClient client = new FcrepoClientBuilder().throwExceptionOnFailure().build();
+
+        final URI jsonldResource = attempt(60, () -> {
+            try (FcrepoResponse response = client
+                    .post(URI.create(fcrepoBaseURI))
+                    .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
+                    .perform()) {
+                return response.getLocation();
+            }
+        });
+
+        try (FcrepoResponse response = client
+                .get(jsonldResource)
+                .accept("application/ld+json; profile=\"http://www.w3.org/ns/json-ld#compacted\"")
+                .perform()) {
+
+            final String body = IOUtils.toString(response.getBody(), UTF_8);
+            assertCompact(body);
+
+            assertNotNull(response.getHeaderValue("X-CREATED"));
+            assertNotNull(response.getHeaderValue("X-MODIFIED"));
+        }
+    }
+
+    @Test
+    public void compactionTesWithAcceptCompactAndPrefersOmitFedora() throws Exception {
+        final FcrepoClient client = new FcrepoClientBuilder().throwExceptionOnFailure().build();
+
+        final URI jsonldResource = attempt(60, () -> {
+            try (FcrepoResponse response = client
+                    .post(URI.create(fcrepoBaseURI))
+                    .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
+                    .perform()) {
+                return response.getLocation();
+            }
+        });
+
+        try (FcrepoResponse response = client
+                .get(jsonldResource)
+                .accept("application/ld+json; profile=\"http://www.w3.org/ns/json-ld#compacted\"").preferRepresentation(Arrays.asList(), Arrays.asList(URI.create("http://fedora.info/definitions/v4/repository#ServerManaged")))
+                .perform()) {
+
+            final String body = IOUtils.toString(response.getBody(), UTF_8);
+            assertCompact(body);
+
+            assertNotNull(response.getHeaderValue("X-CREATED"));
+            assertNotNull(response.getHeaderValue("X-MODIFIED"));
         }
     }
 
