@@ -29,10 +29,14 @@ import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 /**
  * JSONLD test utils
- * 
+ *
  * @author apb@jhu.edu
  */
 public class JsonldTestUtil {
+
+    private JsonldTestUtil() {
+        //never called
+    }
 
     final static Map<String, Object> compacted = Collections.unmodifiableMap(getCompacted());
 
@@ -44,7 +48,7 @@ public class JsonldTestUtil {
     public static String getUncompactedJsonld() {
         try {
             return IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
-                    "/uncompacted.json"), UTF_8);
+                "/uncompacted.json"), UTF_8);
         } catch (final IOException e) {
             throw new RuntimeException("Could not read test JSON-LD", e);
         }
@@ -64,7 +68,7 @@ public class JsonldTestUtil {
     private static Map<String, Object> getCompacted() {
         try {
             return redact(new JSONObject(IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
-                    "/compact.json"), UTF_8)).toMap());
+                "/compact.json"), UTF_8)).toMap());
         } catch (final IOException e) {
             throw new RuntimeException("Could not read compacted JSON-LD");
         }

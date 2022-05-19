@@ -78,8 +78,8 @@ public class JsonldNtriplesTranslator {
 
             final Object parsed = fromString(jsonld);
             String ntriples = ((String) JsonLdProcessor.toRDF(parsed,
-                    RDFDatasetUtils::toNQuads,
-                    options)).replaceAll(NULL_RELATIVE, "");
+                                                              RDFDatasetUtils::toNQuads,
+                                                              options)).replaceAll(NULL_RELATIVE, "");
 
             if (persistContext && parsed instanceof Map) {
                 final Object cxt = ((Map<String, Object>) parsed).get("@context");
@@ -90,11 +90,11 @@ public class JsonldNtriplesTranslator {
 
             if (strict) {
                 if (Arrays.stream(ntriples.split("\\n"))
-                        .map(String::trim)
-                        .filter(line -> !line.startsWith("<_"))
-                        .collect(Collectors.toList()).isEmpty()) {
+                          .map(String::trim)
+                          .filter(line -> !line.startsWith("<_"))
+                          .collect(Collectors.toList()).isEmpty()) {
                     throw new BadRequestException(
-                            "No id (e.g. @id) provided. At least use the null-relative URI; \"@id\": \"\"");
+                        "No id (e.g. @id) provided. At least use the null-relative URI; \"@id\": \"\"");
                 }
             }
 
@@ -127,13 +127,13 @@ public class JsonldNtriplesTranslator {
     private void addAliases(Set<String> keys, ObjectNode parsedJson, JsonLdOptions options) {
         if (parsedJson.get("@context").isTextual()) {
             final RemoteDocument doc = options.getDocumentLoader().loadDocument(parsedJson.get("@context")
-                    .textValue());
+                                                                                          .textValue());
             final Map<String, Object> cxt = (Map<String, Object>) ((Map<String, Object>) doc.getDocument()).get(
-                    "@context");
+                "@context");
             cxt.entrySet().stream()
-                    .filter(e -> internalPrefixes.contains(e.getValue()))
-                    .map(e -> e.getKey())
-                    .forEach(keys::add);
+               .filter(e -> internalPrefixes.contains(e.getValue()))
+               .map(e -> e.getKey())
+               .forEach(keys::add);
 
         } else if (parsedJson.get("@context").isObject()) {
             final ObjectNode cxt = (ObjectNode) parsedJson.get("@context");

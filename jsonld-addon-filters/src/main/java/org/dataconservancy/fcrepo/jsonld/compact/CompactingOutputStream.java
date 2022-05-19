@@ -52,9 +52,9 @@ public class CompactingOutputStream extends FilterOutputStream {
     /**
      * Wrap the given OutputStream with the given compactor and context URL.
      *
-     * @param out OutputStream to wrap
+     * @param out       OutputStream to wrap
      * @param compactor Compactor to use
-     * @param context Context URL. May be null (in which case, no compaction is done).
+     * @param context   Context URL. May be null (in which case, no compaction is done).
      */
     public CompactingOutputStream(OutputStream out, Compactor compactor, URL context) {
         super(out);

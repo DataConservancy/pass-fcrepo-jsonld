@@ -18,15 +18,19 @@ package org.dataconservancy.fcrepo.jsonld;
 
 import static org.dataconservancy.fcrepo.jsonld.ConfigUtil.props;
 
-import org.slf4j.LoggerFactory;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author apb@jhu.edu
  */
 public class LogUtil {
+
+    private LogUtil() {
+        //never called
+    }
+
 
     static final String PREFIX = "log.";
 
@@ -35,8 +39,8 @@ public class LogUtil {
         root.setLevel(Level.WARN);
 
         props()
-                .filter(key -> key.startsWith(PREFIX))
-                .forEach(LogUtil::updateLogger);
+            .filter(key -> key.startsWith(PREFIX))
+            .forEach(LogUtil::updateLogger);
     }
 
     static void updateLogger(final String spec) {

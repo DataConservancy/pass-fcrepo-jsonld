@@ -21,11 +21,10 @@ import static org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil.assertCompac
 
 import java.net.URI;
 
+import org.apache.commons.io.IOUtils;
 import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
 import org.fcrepo.client.FcrepoResponse;
-
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 /**
@@ -34,7 +33,7 @@ import org.junit.Test;
 public class DeserializationIT implements FcrepoIT {
 
     String fcrepoBaseURI = String.format("http://localhost:%s/%s/rest/", System.getProperty(
-            "fcrepo.dynamic.test.port", "8080"), System.getProperty("fcrepo.cxtPath", "fcrepo"));
+        "fcrepo.dynamic.test.port", "8080"), System.getProperty("fcrepo.cxtPath", "fcrepo"));
 
     @Test
     public void deserializationTest() throws Exception {
@@ -43,17 +42,17 @@ public class DeserializationIT implements FcrepoIT {
         final URI jsonldResource = attempt(60, () -> {
 
             try (FcrepoResponse response = client
-                    .post(URI.create(fcrepoBaseURI))
-                    .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
-                    .perform()) {
+                .post(URI.create(fcrepoBaseURI))
+                .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
+                .perform()) {
                 return response.getLocation();
             }
         });
 
         try (FcrepoResponse response = client
-                .get(jsonldResource)
-                .accept("application/ld+json")
-                .perform()) {
+            .get(jsonldResource)
+            .accept("application/ld+json")
+            .perform()) {
 
             final String body = IOUtils.toString(response.getBody(), UTF_8);
 

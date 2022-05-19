@@ -24,7 +24,6 @@ import static org.dataconservancy.fcrepo.jsonld.JsonldUtil.loadContexts;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Optional;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -34,14 +33,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.github.jsonldjava.core.JsonLdOptions;
 import org.dataconservancy.fcrepo.jsonld.BadRequestException;
 import org.dataconservancy.fcrepo.jsonld.JsonldNtriplesTranslator;
 import org.dataconservancy.fcrepo.jsonld.LogUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.jsonldjava.core.JsonLdOptions;
 
 /**
  * @author apb@jhu.edu
@@ -76,7 +73,7 @@ public class DeserializationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
+        ServletException {
 
         final HttpServletResponse resp = (HttpServletResponse) response;
 
@@ -84,11 +81,11 @@ public class DeserializationFilter implements Filter {
 
         final String method = ((HttpServletRequest) request).getMethod();
         final String contentType = Optional.ofNullable(
-                request.getContentType()).orElse(Optional.ofNullable(((HttpServletRequest) request).getHeader(
-                        "content-type")).orElse(""));
+            request.getContentType()).orElse(Optional.ofNullable(((HttpServletRequest) request).getHeader(
+            "content-type")).orElse(""));
 
         if (("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method)) &&
-                contentType.contains("application/ld+json")) {
+            contentType.contains("application/ld+json")) {
             try {
                 LOG.debug("Deserialization filter is deserializing JSON-LD");
                 chain.doFilter(new DeserializationWrapper((HttpServletRequest) request, translator), response);

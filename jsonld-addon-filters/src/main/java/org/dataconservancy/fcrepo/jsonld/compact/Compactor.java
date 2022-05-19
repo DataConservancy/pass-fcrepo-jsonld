@@ -26,15 +26,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.dataconservancy.fcrepo.jsonld.JsonldNtriplesTranslator;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
+import org.dataconservancy.fcrepo.jsonld.JsonldNtriplesTranslator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Compacts jsonld according to a given context.
@@ -69,7 +67,7 @@ class Compactor {
     /**
      * Produce a compact representation of the given jsonld content.
      *
-     * @param jsonld The jsonld.
+     * @param jsonld         The jsonld.
      * @param defaultContext Context URI to use when compacting.
      * @return Compacted JSON-LD.
      * @throws Exception
@@ -88,7 +86,7 @@ class Compactor {
             final Map<String, Object> cxt = getContext(contextUri);
 
             final String compacted = JsonUtils.toPrettyString(
-                    JsonLdProcessor.compact(fromString(jsonld), cxt, options));
+                JsonLdProcessor.compact(fromString(jsonld), cxt, options));
 
             if (limitCompaction) {
                 LOG.debug("Limiting response to attributes defined in context {}", contextUri);
@@ -119,7 +117,7 @@ class Compactor {
 
     @SuppressWarnings("unchecked")
     private String stripAttrsNotDefinedInContext(String jsonld, String context, Object parsedAttrs)
-            throws IOException {
+        throws IOException {
         final Map<String, Object> parsedJson = (Map<String, Object>) fromString(jsonld);
         final Map<String, Object> attrs = (Map<String, Object>) parsedAttrs;
         final List<String> toRemove = new ArrayList<>();

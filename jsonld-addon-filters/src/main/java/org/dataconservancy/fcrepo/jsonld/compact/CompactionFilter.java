@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -41,14 +40,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dataconservancy.fcrepo.jsonld.LogUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jsonldjava.core.JsonLdOptions;
+import org.dataconservancy.fcrepo.jsonld.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet filter which compacts responses according to configured context.
@@ -74,7 +72,7 @@ public class CompactionFilter implements Filter {
         LOG.info("Initializing compaction filter");
 
         final String context = Optional.ofNullable(filterConfig.getInitParameter("context")).orElse(getValue(
-                CONTEXT_COMPACTION_URI_PROP));
+            CONTEXT_COMPACTION_URI_PROP));
 
         if (context != null) {
             LOG.info("Compacting responses with context '{}'", context);
@@ -106,7 +104,7 @@ public class CompactionFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-    ServletException {
+        ServletException {
 
         final HttpServletRequest req = (HttpServletRequest) request;
         final HttpServletResponse resp = (HttpServletResponse) response;
@@ -116,14 +114,16 @@ public class CompactionFilter implements Filter {
         try {
             LOG.debug("Compaction filter will examine response");
             final CompactionWrapper compactionWrapper = new CompactionWrapper(resp,
-                    compactor,
-                    defaultContext);
+                                                                              compactor,
+                                                                              defaultContext);
             chain.doFilter(new CompactionRequestWrapper(req), compactionWrapper);
 
             if (compactionWrapper.compactingOutputStream.compactionEnabled
-                    && compactionWrapper.compactingOutputStream.captured.size() > 0) {
+                && compactionWrapper.compactingOutputStream.captured.size() > 0) {
                 ObjectNode rawJson = asObject(new ObjectMapper()
-                        .readValue(compactionWrapper.compactingOutputStream.captured.toByteArray(), JsonNode.class));
+                                                  .readValue(
+                                                      compactionWrapper.compactingOutputStream.captured.toByteArray(),
+                                                      JsonNode.class));
 
                 String lastModified = null;
                 String created = null;
@@ -131,8 +131,10 @@ public class CompactionFilter implements Filter {
                 // Put created and last modified properties into headers.
                 // Must check for compact and expanded JSON-LD properties.
 
-                ObjectNode lastModifiedObject = asObject(rawJson.get("http://fedora.info/definitions/v4/repository#lastModified"));
-                ObjectNode createdObject = asObject(rawJson.get("http://fedora.info/definitions/v4/repository#created"));
+                ObjectNode lastModifiedObject = asObject(
+                    rawJson.get("http://fedora.info/definitions/v4/repository#lastModified"));
+                ObjectNode createdObject = asObject(
+                    rawJson.get("http://fedora.info/definitions/v4/repository#created"));
 
                 if (lastModifiedObject == null) {
                     if (rawJson.has("lastModified")) {
@@ -218,8 +220,8 @@ public class CompactionFilter implements Filter {
 
         @Override
         public Enumeration<String> getHeaderNames() {
-            final Enumeration<String> origNames = super.getHeaderNames() == null ? Collections.enumeration(Collections
-                    .emptyList()) : super.getHeaderNames();
+            final Enumeration<String> origNames = super.getHeaderNames() == null ?
+                Collections.enumeration(Collections.emptyList()) : super.getHeaderNames();
             final List<String> names = Collections.list(origNames);
             if (!names.contains("accept")) {
                 names.add("accept");

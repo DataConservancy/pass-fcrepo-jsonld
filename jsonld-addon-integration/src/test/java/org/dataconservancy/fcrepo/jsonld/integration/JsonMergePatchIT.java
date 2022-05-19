@@ -24,13 +24,8 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
 import java.io.IOException;
 import java.net.URI;
 
-import org.fcrepo.client.FcrepoClient;
-import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
-import org.fcrepo.client.FcrepoOperationFailedException;
-import org.fcrepo.client.FcrepoResponse;
-
-import org.dataconservancy.fcrepo.jsonld.test.JsonMergePatchTests;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPatch;
@@ -38,11 +33,13 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.dataconservancy.fcrepo.jsonld.test.JsonMergePatchTests;
+import org.fcrepo.client.FcrepoClient;
+import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
+import org.fcrepo.client.FcrepoOperationFailedException;
+import org.fcrepo.client.FcrepoResponse;
 import org.junit.Test;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author apb@jhu.edu
@@ -59,14 +56,15 @@ public class JsonMergePatchIT extends JsonMergePatchTests implements FcrepoIT {
     public void prolematicPatchTest() throws Exception {
         final URI resource;
         try (FcrepoResponse response = client.post(URI.create(fcrepoBaseURI))
-                .body(this.getClass().getResourceAsStream("/pass_object.nt"), "text/turtle")
-                .perform()) {
+                                             .body(this.getClass().getResourceAsStream("/pass_object.nt"),
+                                                   "text/turtle")
+                                             .perform()) {
             assertSuccess(response);
             resource = response.getLocation();
         }
 
         try (FcrepoResponse response = client.patch(resource).body(this.getClass().getResourceAsStream(
-                "/pass_patch.sparql")).perform()) {
+            "/pass_patch.sparql")).perform()) {
             assertSuccess(response);
         }
 
@@ -92,9 +90,9 @@ public class JsonMergePatchIT extends JsonMergePatchTests implements FcrepoIT {
     private URI add(String json) {
         return attempt(1, () -> {
             try (FcrepoResponse response = client
-                    .post(URI.create(fcrepoBaseURI))
-                    .body(toInputStream(json, UTF_8), "application/ld+json")
-                    .perform()) {
+                .post(URI.create(fcrepoBaseURI))
+                .body(toInputStream(json, UTF_8), "application/ld+json")
+                .perform()) {
                 assertSuccess(response);
                 return response.getLocation();
             }
@@ -116,8 +114,8 @@ public class JsonMergePatchIT extends JsonMergePatchTests implements FcrepoIT {
         }
 
         try (FcrepoResponse response = client.get(id)
-                .accept("application/ld+json")
-                .perform()) {
+                                             .accept("application/ld+json")
+                                             .perform()) {
             return IOUtils.toString(response.getBody(), UTF_8);
         } catch (IOException | FcrepoOperationFailedException e) {
             throw new RuntimeException("Connection error", e);
@@ -134,7 +132,8 @@ public class JsonMergePatchIT extends JsonMergePatchTests implements FcrepoIT {
         final String expected = expectedJson.replace(TEST_RESOURCE_ID, resourceUri.toString());
 
         final String result = doPatch(resourceUri, patch);
-        assertJsonEquals(expected, result);;
+        assertJsonEquals(expected, result);
+        ;
     }
 
     @Override
