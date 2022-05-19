@@ -34,6 +34,10 @@ import com.github.jsonldjava.core.JsonLdOptions;
  */
 public class ContextUtil {
 
+    private ContextUtil() {
+        //never called
+    }
+
     static final ObjectMapper mapper = new ObjectMapper();
 
     public static final String PREDICATE_HAS_CONTEXT = "http://dataconservancy.org/ns/jsonld#hasContext";
@@ -58,8 +62,8 @@ public class ContextUtil {
         final Object rawContext;
         if (contextNode.isTextual()) {
             rawContext = options.getDocumentLoader()
-                    .loadDocument(contextNode.asText())
-                    .getDocument();
+                                .loadDocument(contextNode.asText())
+                                .getDocument();
         } else {
             final JsonNode inlineContext = mapper.createObjectNode().set("@context", contextNode);
             try {

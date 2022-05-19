@@ -25,17 +25,15 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
 
-import org.dataconservancy.fcrepo.jsonld.test.JsonMergePatchTests;
-
+import com.github.jsonldjava.core.JsonLdOptions;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.update.UpdateAction;
+import org.dataconservancy.fcrepo.jsonld.test.JsonMergePatchTests;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.github.jsonldjava.core.JsonLdOptions;
 
 /**
  * @author apb@jhu.edu
@@ -54,8 +52,8 @@ public class JsonMergePatchTranslatorTest extends JsonMergePatchTests {
         options = new JsonLdOptions();
 
         addStaticContext(new URL("http://example.org/farm"), JsonMergePatchTranslatorTest.class
-                .getResourceAsStream("/context.jsonld"),
-                options);
+                             .getResourceAsStream("/context.jsonld"),
+                         options);
 
         toTest = new JsonMergePatchTranslator(options, false, false);
         nt = new JsonldNtriplesTranslator(options, false, false);
@@ -64,20 +62,20 @@ public class JsonMergePatchTranslatorTest extends JsonMergePatchTests {
     @Test
     public void defaultContextTest() throws Exception {
         final String identitylNoContext = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"] " +
-                "}";
+                                          "\"@id\": \"test:123\", " +
+                                          "\"@type\": \"Cow\", " +
+                                          "\"healthy\": true, " +
+                                          "\"milkVolume\": 100.6, " +
+                                          "\"barn\": \"test:/barn\", " +
+                                          "\"calves\": [\"test:/1\", \"test:2\"] " +
+                                          "}";
 
         final Model rdf = toModel(INITIAL);
 
         final Model expected = ModelFactory.createDefaultModel().add(rdf);
 
         UpdateAction.parseExecute(toTest.toSparql(identitylNoContext, URI.create("http://example.org/farm")),
-                rdf);
+                                  rdf);
 
         assertTrue(expected.isIsomorphicWith(rdf));
     }
@@ -87,32 +85,32 @@ public class JsonMergePatchTranslatorTest extends JsonMergePatchTests {
         final JsonMergePatchTranslator translatorWithPersistence = new JsonMergePatchTranslator(options, false, true);
 
         final String input = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\"], " +
-                "\"@context\": \"http://example.org/farm\"" +
-                "}";
+                             "\"@id\": \"test:123\", " +
+                             "\"@type\": \"Cow\", " +
+                             "\"healthy\": true, " +
+                             "\"milkVolume\": 100.6, " +
+                             "\"barn\": \"test:/barn\", " +
+                             "\"calves\": [\"test:/1\"], " +
+                             "\"@context\": \"http://example.org/farm\"" +
+                             "}";
 
         final Model existing = ModelFactory.createDefaultModel();
         final Property hasContext = existing.createProperty(PREDICATE_HAS_CONTEXT);
         existing.add(
-                existing.createResource("test:123"),
-                hasContext,
-                existing.createResource("test:obsolete"));
+            existing.createResource("test:123"),
+            hasContext,
+            existing.createResource("test:obsolete"));
 
         UpdateAction.parseExecute(translatorWithPersistence.toSparql(input, null), existing);
 
         assertEquals(1, existing.listStatements(null, hasContext, (RDFNode) null).toList().size());
         assertEquals(1, existing.listStatements(null, hasContext, existing.createResource(
-                "http://example.org/farm")).toList().size());
+            "http://example.org/farm")).toList().size());
     }
 
     private Model toModel(String jsonld) {
         return ModelFactory.createDefaultModel().read(new StringReader(nt.translate(jsonld)), null,
-                "NTriples");
+                                                      "NTriples");
     }
 
     @Override

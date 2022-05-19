@@ -26,13 +26,11 @@ import static org.junit.Assert.fail;
 
 import java.net.URL;
 
-import org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil;
-
+import com.github.jsonldjava.core.JsonLdOptions;
 import org.apache.commons.io.IOUtils;
+import org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.github.jsonldjava.core.JsonLdOptions;
 
 /**
  * @author apb@jhu.edu
@@ -65,7 +63,7 @@ public class CompactorTest {
         final Compactor willNotDrop = new Compactor(options, false, false);
 
         final String hasDataNotInContext = IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
-                "/uncompacted-with-unwanted-data.json"), UTF_8);
+            "/uncompacted-with-unwanted-data.json"), UTF_8);
 
         try {
             assertCompact(willNotDrop.compact(hasDataNotInContext, CONTEXT_URL));
@@ -88,7 +86,7 @@ public class CompactorTest {
         final Compactor withPersist = new Compactor(myOptions, true, true);
 
         final String jsonWithPersistedContext = IOUtils.toString(JsonldTestUtil.class.getResourceAsStream(
-                "/compact-uri-with-persisted-context.json"), UTF_8);
+            "/compact-uri-with-persisted-context.json"), UTF_8);
 
         final String results = withPersist.compact(jsonWithPersistedContext, CONTEXT_URL);
         assertCompact(results);

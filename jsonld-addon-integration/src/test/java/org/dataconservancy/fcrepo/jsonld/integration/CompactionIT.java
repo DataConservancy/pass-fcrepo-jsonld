@@ -26,10 +26,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 
-import org.fcrepo.client.FcrepoClient;
-import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
-import org.fcrepo.client.FcrepoResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -38,6 +34,9 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.fcrepo.client.FcrepoClient;
+import org.fcrepo.client.FcrepoClient.FcrepoClientBuilder;
+import org.fcrepo.client.FcrepoResponse;
 import org.junit.Test;
 
 /**
@@ -53,17 +52,17 @@ public class CompactionIT implements FcrepoIT {
 
         final URI jsonldResource = attempt(60, () -> {
             try (FcrepoResponse response = client
-                    .post(URI.create(fcrepoBaseURI))
-                    .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
-                    .perform()) {
+                .post(URI.create(fcrepoBaseURI))
+                .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
+                .perform()) {
                 return response.getLocation();
             }
         });
 
         try (FcrepoResponse response = client
-                .get(jsonldResource)
-                .accept("application/ld+json")
-                .perform()) {
+            .get(jsonldResource)
+            .accept("application/ld+json")
+            .perform()) {
 
             final String body = IOUtils.toString(response.getBody(), UTF_8);
             assertCompact(body);
@@ -79,17 +78,17 @@ public class CompactionIT implements FcrepoIT {
 
         final URI jsonldResource = attempt(60, () -> {
             try (FcrepoResponse response = client
-                    .post(URI.create(fcrepoBaseURI))
-                    .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
-                    .perform()) {
+                .post(URI.create(fcrepoBaseURI))
+                .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
+                .perform()) {
                 return response.getLocation();
             }
         });
 
         try (FcrepoResponse response = client
-                .get(jsonldResource)
-                .accept("application/ld+json; profile=\"http://www.w3.org/ns/json-ld#compacted\"")
-                .perform()) {
+            .get(jsonldResource)
+            .accept("application/ld+json; profile=\"http://www.w3.org/ns/json-ld#compacted\"")
+            .perform()) {
 
             final String body = IOUtils.toString(response.getBody(), UTF_8);
             assertCompact(body);
@@ -105,17 +104,19 @@ public class CompactionIT implements FcrepoIT {
 
         final URI jsonldResource = attempt(60, () -> {
             try (FcrepoResponse response = client
-                    .post(URI.create(fcrepoBaseURI))
-                    .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
-                    .perform()) {
+                .post(URI.create(fcrepoBaseURI))
+                .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
+                .perform()) {
                 return response.getLocation();
             }
         });
 
         try (FcrepoResponse response = client
-                .get(jsonldResource)
-                .accept("application/ld+json; profile=\"http://www.w3.org/ns/json-ld#compacted\"").preferRepresentation(Arrays.asList(), Arrays.asList(URI.create("http://fedora.info/definitions/v4/repository#ServerManaged")))
-                .perform()) {
+            .get(jsonldResource)
+            .accept("application/ld+json; profile=\"http://www.w3.org/ns/json-ld#compacted\"")
+            .preferRepresentation(Arrays.asList(), Arrays.asList(
+                URI.create("http://fedora.info/definitions/v4/repository#ServerManaged")))
+            .perform()) {
 
             final String body = IOUtils.toString(response.getBody(), UTF_8);
             assertCompact(body);
@@ -129,7 +130,7 @@ public class CompactionIT implements FcrepoIT {
     public void compactionPostTest() throws Exception {
         final HttpPost post = new HttpPost(URI.create(fcrepoBaseURI));
         post.setEntity(new InputStreamEntity(this.getClass().getResourceAsStream("/compact-uri.json"), ContentType
-                .create("application/ld+json")));
+            .create("application/ld+json")));
         post.setHeader("Accept", "application/ld+json");
         post.setHeader("Prefer", "return=representation");
 
@@ -146,16 +147,16 @@ public class CompactionIT implements FcrepoIT {
 
         final URI jsonldResource = attempt(60, () -> {
             try (FcrepoResponse response = client
-                    .post(URI.create(fcrepoBaseURI))
-                    .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
-                    .perform()) {
+                .post(URI.create(fcrepoBaseURI))
+                .body(this.getClass().getResourceAsStream("/compact-uri.json"), "application/ld+json")
+                .perform()) {
                 return response.getLocation();
             }
         });
 
         try (FcrepoResponse response = client
-                .head(jsonldResource)
-                .perform()) {
+            .head(jsonldResource)
+            .perform()) {
             assertFalse(response.getLinkHeaders("type").isEmpty());
         }
     }

@@ -19,7 +19,6 @@ package org.dataconservancy.fcrepo.jsonld.compact;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;

@@ -1,6 +1,6 @@
 {
-  "awardNumber" : "abc123",
-  "startDate" : "2018-03-16T19:23:56.674Z",
-  "@context" : "https://oa-pass.github.io/pass-data-model/src/main/resources/context.jsonld",
-  "@type" : "Grant"
+  "awardNumber": "abc123",
+  "startDate": "2018-03-16T19:23:56.674Z",
+  "@context": "https://oa-pass.github.io/pass-data-model/src/main/resources/context.jsonld",
+  "@type": "Grant"
 }

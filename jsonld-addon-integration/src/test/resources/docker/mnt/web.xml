@@ -17,9 +17,9 @@
 -->
 
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-     version="3.0">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
 
   <display-name>Apache Jena Fuseki Server</display-name>
 
@@ -41,7 +41,7 @@
     <filter-name>cross-origin</filter-name>
     <!-- Ported and standalone version of org.eclipse.jetty.servlets.CrossOriginFilter -->
     <filter-class>org.apache.jena.fuseki.servlets.CrossOriginFilter</filter-class>
-    <!-- Defaults may be fine --> 
+    <!-- Defaults may be fine -->
     <init-param>
       <param-name>allowedOrigins</param-name>
       <param-value>*</param-value>
@@ -59,30 +59,30 @@
       <param-value>Access-Control-Allow-Origin,Access-Control-Allow-Credentials</param-value>
     </init-param>
   </filter>
-  
+
   <filter-mapping>
     <filter-name>cross-origin</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  
-  
+
+
   <filter>
     <filter-name>request-substitution-filter</filter-name>
     <filter-class>org.dataconservancy.fcrepo.jsonld.request.SubstitutionRequestFilter</filter-class>
     <async-supported>true</async-supported>
   </filter>
-  
+
   <filter-mapping>
     <filter-name>request-substitution-filter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  
+
   <filter>
     <filter-name>response-substitution-filter</filter-name>
     <filter-class>org.dataconservancy.fcrepo.jsonld.response.SubstitutionResponseFilter</filter-class>
     <async-supported>true</async-supported>
   </filter>
-  
+
   <filter-mapping>
     <filter-name>response-substitution-filter</filter-name>
     <url-pattern>/*</url-pattern>
@@ -110,7 +110,7 @@
     -->
     <param-value>shiro.ini</param-value>
   </context-param>
-  
+
   <!-- Apache Jena Fuseki setup -->
 
   <listener>
@@ -174,7 +174,7 @@
   </servlet-mapping>
 
   <!-- Admin controls-->
-  
+
   <servlet>
     <servlet-name>DumpServlet</servlet-name>
     <servlet-class>org.apache.jena.fuseki.mgt.DumpServlet</servlet-class>
@@ -189,7 +189,7 @@
     <servlet-name>PingServlet</servlet-name>
     <servlet-class>org.apache.jena.fuseki.mgt.ActionPing</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>BackupListServlet</servlet-name>
     <servlet-class>org.apache.jena.fuseki.mgt.ActionBackupList</servlet-class>
@@ -201,8 +201,8 @@
   </servlet-mapping>
 
   <servlet-mapping>
-   <servlet-name>DumpServlet</servlet-name>
-   <url-pattern>/$/dump</url-pattern>
+    <servlet-name>DumpServlet</servlet-name>
+    <url-pattern>/$/dump</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -214,12 +214,12 @@
     <servlet-name>PingServlet</servlet-name>
     <url-pattern>/$/ping</url-pattern>
   </servlet-mapping>
-  
+
   <servlet>
     <servlet-name>ActionDatasets</servlet-name>
     <servlet-class>org.apache.jena.fuseki.mgt.ActionDatasets</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>ActionStats</servlet-name>
     <servlet-class>org.apache.jena.fuseki.mgt.ActionStats</servlet-class>
@@ -323,7 +323,7 @@
     <extension>trdf</extension>
     <mime-type>application/rdf+thrift</mime-type>
   </mime-mapping>
-  
+
   <mime-mapping>
     <extension>rq</extension>
     <mime-type>application/sparql-query</mime-type>

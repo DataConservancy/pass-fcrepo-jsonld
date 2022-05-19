@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -41,9 +40,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import org.dataconservancy.fcrepo.jsonld.LogUtil;
-
 import org.apache.commons.io.IOUtils;
+import org.dataconservancy.fcrepo.jsonld.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,20 +76,20 @@ public class SubstitutionRequestFilter implements Filter {
         LOG.info("Initializing substitution filter");
 
         extract(props(), SUBSTITUTION_REQUEST_HOST)
-                .entrySet().stream().forEach(e -> hosts.put(e.getValue(), e.getKey()));
+            .entrySet().stream().forEach(e -> hosts.put(e.getValue(), e.getKey()));
 
         terms = extract(props(), SUBSTITUTION_REQUEST_TERM);
         replacements = extract(props(), SUBSTITUTION_REQUEST_REPLACEMENT);
 
         hosts.entrySet().forEach(host -> LOG.info("{}: Replacing {} with {}",
-                host.getKey(),
-                terms.get(host.getValue()),
-                replacements.get(host.getValue())));
+                                                  host.getKey(),
+                                                  terms.get(host.getValue()),
+                                                  replacements.get(host.getValue())));
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
+        ServletException {
 
         LOG.debug("Do filter");
 
@@ -104,23 +102,23 @@ public class SubstitutionRequestFilter implements Filter {
         }
 
         final HttpServletRequest req = new ParamReplacingWrapper((HttpServletRequest) request, param -> param.replace(
-                terms.get(key), replacements.get(key)));
+            terms.get(key), replacements.get(key)));
 
         final String method = req.getMethod();
 
         final String contentType = Optional.ofNullable(req.getHeader(
-                "content-type")).orElse(Optional.ofNullable(req.getContentType()).orElse(""));
+            "content-type")).orElse(Optional.ofNullable(req.getContentType()).orElse(""));
 
         if ("POST".equals(method) && contentType.contains("urlencoded")) {
             LOG.debug("POST urlencoded");
             chain.doFilter(new BodyReplacingWrapper(
-                    req,
-                    body -> encode(decode(body).replace(terms.get(key), replacements.get(key)))), response);
+                req,
+                body -> encode(decode(body).replace(terms.get(key), replacements.get(key)))), response);
         } else if ("POST".equals(method)) {
             LOG.debug("POST no urlencode");
             chain.doFilter(new BodyReplacingWrapper(
-                    req,
-                    body -> body.replace(terms.get(key), replacements.get(key))), response);
+                req,
+                body -> body.replace(terms.get(key), replacements.get(key))), response);
         } else {
             LOG.debug("Nothing, method: " + method);
             chain.doFilter(req, response);
@@ -174,7 +172,7 @@ public class SubstitutionRequestFilter implements Filter {
                         final String content = IOUtils.toString(delegate, UTF_8);
                         final String replaced = replacer.apply(content);
                         translated.set(new ByteArrayInputStream(
-                                replaced.getBytes(UTF_8)));
+                            replaced.getBytes(UTF_8)));
                         LOG.debug("Raw body: " + content);
                         LOG.debug("Translated: " + replaced);
                     }

@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Optional;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -44,15 +43,13 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import com.github.jsonldjava.core.JsonLdOptions;
+import org.apache.commons.io.IOUtils;
 import org.dataconservancy.fcrepo.jsonld.BadRequestException;
 import org.dataconservancy.fcrepo.jsonld.JsonMergePatchTranslator;
 import org.dataconservancy.fcrepo.jsonld.LogUtil;
-
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.jsonldjava.core.JsonLdOptions;
 
 /**
  * @author apb@jhu.edu
@@ -94,14 +91,14 @@ public class JsonMergePatchFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
+        ServletException {
         final HttpServletRequest req = (HttpServletRequest) request;
         final HttpServletResponse resp = (HttpServletResponse) response;
 
         final String method = req.getMethod();
 
         final String contentType = Optional.ofNullable(req.getHeader(
-                "content-type")).orElse(Optional.ofNullable(req.getContentType()).orElse(""));
+            "content-type")).orElse(Optional.ofNullable(req.getContentType()).orElse(""));
 
         LOG.debug("Looking at request");
         if ("PATCH".equals(method) && contentType.contains(JSON_MERGE_PATCH)) {

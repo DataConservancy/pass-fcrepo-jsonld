@@ -18,9 +18,8 @@ package org.dataconservancy.fcrepo.jsonld.test;
 
 import static org.junit.Assert.fail;
 
-import org.junit.Test;
-
 import com.github.jsonldjava.core.JsonLdOptions;
+import org.junit.Test;
 
 /**
  * @author apb@jhu.edu
@@ -32,15 +31,15 @@ public abstract class JsonMergePatchTests {
     protected static final String TEST_RESOURCE_ID = "test:123";
 
     protected static final String INITIAL = "{ " +
-            "\"@id\": \"test:123\", " +
-            "\"@type\": \"Cow\", " +
-            "\"healthy\": true, " +
-            "\"milkVolume\": 100.6, " +
-            "\"barn\": \"test:/barn\", " +
-            "\"birthDate\": \"1980-03-20T21:25:43.511Z\", " +
-            "\"calves\": [\"test:/1\", \"test:2\"], " +
-            "\"@context\": \"http://example.org/farm\"" +
-            "}";
+                                            "\"@id\": \"test:123\", " +
+                                            "\"@type\": \"Cow\", " +
+                                            "\"healthy\": true, " +
+                                            "\"milkVolume\": 100.6, " +
+                                            "\"barn\": \"test:/barn\", " +
+                                            "\"birthDate\": \"1980-03-20T21:25:43.511Z\", " +
+                                            "\"calves\": [\"test:/1\", \"test:2\"], " +
+                                            "\"@context\": \"http://example.org/farm\"" +
+                                            "}";
 
     protected abstract void assertPatch(String jsomMergePatch, String expectedJson);
 
@@ -56,9 +55,9 @@ public abstract class JsonMergePatchTests {
     public void noOpTest() throws Exception {
 
         final String noop = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@context\": \"http://example.org/farm\"" +
-                "}";
+                            "\"@id\": \"test:123\", " +
+                            "\"@context\": \"http://example.org/farm\"" +
+                            "}";
 
         assertPatch(noop, INITIAL);
     }
@@ -67,20 +66,20 @@ public abstract class JsonMergePatchTests {
     public void deleteAttributeTest() throws Exception {
 
         final String deleteHealthy = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"healthy\": null, " +
-                "\"@context\": \"http://example.org/farm\"" +
-                "}";
+                                     "\"@id\": \"test:123\", " +
+                                     "\"healthy\": null, " +
+                                     "\"@context\": \"http://example.org/farm\"" +
+                                     "}";
 
         final String expected = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"birthDate\": \"1980-03-20T21:25:43.511Z\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"], " +
-                "\"@context\": \"http://example.org/farm\"" +
-                "}";
+                                "\"@id\": \"test:123\", " +
+                                "\"@type\": \"Cow\", " +
+                                "\"milkVolume\": 100.6, " +
+                                "\"barn\": \"test:/barn\", " +
+                                "\"birthDate\": \"1980-03-20T21:25:43.511Z\", " +
+                                "\"calves\": [\"test:/1\", \"test:2\"], " +
+                                "\"@context\": \"http://example.org/farm\"" +
+                                "}";
 
         assertPatch(deleteHealthy, expected);
     }
@@ -89,22 +88,22 @@ public abstract class JsonMergePatchTests {
     public void addAttributeTest() throws Exception {
 
         final String addHealthy = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"name\": \"bessie\", " +
-                "\"@context\": \"http://example.org/farm\"" +
-                "}";
+                                  "\"@id\": \"test:123\", " +
+                                  "\"name\": \"bessie\", " +
+                                  "\"@context\": \"http://example.org/farm\"" +
+                                  "}";
 
         final String expected = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"name\": \"bessie\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"birthDate\": \"1980-03-20T21:25:43.511Z\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"], " +
-                "\"@context\": \"http://example.org/farm\"" +
-                "}";
+                                "\"@id\": \"test:123\", " +
+                                "\"@type\": \"Cow\", " +
+                                "\"name\": \"bessie\", " +
+                                "\"healthy\": true, " +
+                                "\"milkVolume\": 100.6, " +
+                                "\"barn\": \"test:/barn\", " +
+                                "\"birthDate\": \"1980-03-20T21:25:43.511Z\", " +
+                                "\"calves\": [\"test:/1\", \"test:2\"], " +
+                                "\"@context\": \"http://example.org/farm\"" +
+                                "}";
 
         assertPatch(addHealthy, expected);
     }
@@ -113,21 +112,21 @@ public abstract class JsonMergePatchTests {
     public void addToListTest() throws Exception {
 
         final String addHealthy = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"calves\": [\"test:/1\", \"test:2\", \"test:3\"], " +
-                "\"@context\": \"http://example.org/farm\"" +
-                "}";
+                                  "\"@id\": \"test:123\", " +
+                                  "\"calves\": [\"test:/1\", \"test:2\", \"test:3\"], " +
+                                  "\"@context\": \"http://example.org/farm\"" +
+                                  "}";
 
         final String expected = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"birthDate\": \"1980-03-20T21:25:43.511Z\", " +
-                "\"calves\": [\"test:/1\", \"test:2\", \"test:3\"], " +
-                "\"@context\": \"http://example.org/farm\"" +
-                "}";
+                                "\"@id\": \"test:123\", " +
+                                "\"@type\": \"Cow\", " +
+                                "\"healthy\": true, " +
+                                "\"milkVolume\": 100.6, " +
+                                "\"barn\": \"test:/barn\", " +
+                                "\"birthDate\": \"1980-03-20T21:25:43.511Z\", " +
+                                "\"calves\": [\"test:/1\", \"test:2\", \"test:3\"], " +
+                                "\"@context\": \"http://example.org/farm\"" +
+                                "}";
 
         assertPatch(addHealthy, expected);
     }
@@ -136,21 +135,21 @@ public abstract class JsonMergePatchTests {
     public void removeFromListTest() throws Exception {
 
         final String addHealthy = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"calves\": [\"test:/1\"], " +
-                "\"@context\": \"http://example.org/farm\"" +
-                "}";
+                                  "\"@id\": \"test:123\", " +
+                                  "\"calves\": [\"test:/1\"], " +
+                                  "\"@context\": \"http://example.org/farm\"" +
+                                  "}";
 
         final String expected = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\"], " +
-                "\"birthDate\": \"1980-03-20T21:25:43.511Z\", " +
-                "\"@context\": \"http://example.org/farm\"" +
-                "}";
+                                "\"@id\": \"test:123\", " +
+                                "\"@type\": \"Cow\", " +
+                                "\"healthy\": true, " +
+                                "\"milkVolume\": 100.6, " +
+                                "\"barn\": \"test:/barn\", " +
+                                "\"calves\": [\"test:/1\"], " +
+                                "\"birthDate\": \"1980-03-20T21:25:43.511Z\", " +
+                                "\"@context\": \"http://example.org/farm\"" +
+                                "}";
 
         assertPatch(addHealthy, expected);
     }
@@ -158,13 +157,13 @@ public abstract class JsonMergePatchTests {
     @Test
     public void noContextProvidedTest() throws Exception {
         final String noContext = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"] " +
-                "}";
+                                 "\"@id\": \"test:123\", " +
+                                 "\"@type\": \"Cow\", " +
+                                 "\"healthy\": true, " +
+                                 "\"milkVolume\": 100.6, " +
+                                 "\"barn\": \"test:/barn\", " +
+                                 "\"calves\": [\"test:/1\", \"test:2\"] " +
+                                 "}";
 
         try {
             doPatch(noContext);

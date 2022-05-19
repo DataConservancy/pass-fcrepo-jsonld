@@ -28,17 +28,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.core.JsonLdOptions;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.jsonldjava.core.JsonLdError;
-import com.github.jsonldjava.core.JsonLdOptions;
 
 /**
  * @author apb@jhu.edu
  */
 public class JsonldUtil {
+    private JsonldUtil() {
+        //never called
+    }
 
     static final Logger LOG = LoggerFactory.getLogger(JsonldUtil.class);
 
@@ -54,15 +56,15 @@ public class JsonldUtil {
             try (FileInputStream file = new FileInputStream(contextLocations.get(entry.getKey()))) {
 
                 LOG.info("Loading static context for '{}' from file '{}'", entry.getValue(), contextLocations.get(
-                        entry.getKey()));
+                    entry.getKey()));
                 addStaticContext(new URL(entry.getValue()), file, options);
             } catch (final MalformedURLException urle) {
                 LOG.warn("Bad json-ld context URL for preload: '{}' from configuration property ", entry.getValue(),
-                        String
-                                .join(".", COMPACTION_PROP_PRELOAD_URIS, entry.getKey()));
+                         String
+                             .join(".", COMPACTION_PROP_PRELOAD_URIS, entry.getKey()));
             } catch (final FileNotFoundException e) {
                 LOG.warn("json-ld context File not found at '{}', from configuration property {}", contextLocations
-                        .get(entry.getKey()), String.join(".", COMPACTION_PROP_PRELOAD_FILES, entry.getKey()));
+                    .get(entry.getKey()), String.join(".", COMPACTION_PROP_PRELOAD_FILES, entry.getKey()));
             } catch (final IOException e) {
                 throw new RuntimeException(e);
             }

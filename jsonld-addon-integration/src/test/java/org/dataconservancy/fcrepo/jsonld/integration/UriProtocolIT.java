@@ -99,9 +99,10 @@ public class UriProtocolIT implements FcrepoIT {
 
             final HttpPost post = new HttpPost(fcrepoBaseURI);
             post.setEntity(EntityBuilder.create()
-                    .setBinary(IOUtils.toByteArray(this.getClass().getResourceAsStream("/compact-uri.json")))
-                    .setContentType(ContentType.create("application/ld+json"))
-                    .build());
+                                        .setBinary(IOUtils.toByteArray(
+                                            this.getClass().getResourceAsStream("/compact-uri.json")))
+                                        .setContentType(ContentType.create("application/ld+json"))
+                                        .build());
 
             if (https) {
                 post.setHeader("X-Forwarded-Proto", "https");

@@ -24,15 +24,13 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import org.dataconservancy.fcrepo.jsonld.JsonldNtriplesTranslator;
-
 import org.apache.commons.io.IOUtils;
+import org.dataconservancy.fcrepo.jsonld.JsonldNtriplesTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +59,7 @@ class DeserializationWrapper extends HttpServletRequestWrapper {
             try (InputStream in = originalInputStream) {
 
                 final String originalBody = IOUtils.toString(
-                        originalInputStream, UTF_8);
+                    originalInputStream, UTF_8);
                 LOG.debug("Original content:\n" + originalBody);
 
                 final String translatedBody = transltor.translate(originalBody);

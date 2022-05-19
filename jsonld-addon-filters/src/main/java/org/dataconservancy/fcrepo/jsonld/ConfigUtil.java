@@ -32,6 +32,10 @@ import org.slf4j.LoggerFactory;
  */
 public class ConfigUtil {
 
+    private ConfigUtil() {
+        //never called
+    }
+
     public static final String JSONLD_STRICT = "jsonld.strict";
 
     public static final String JSONLD_MINIMAL_CONTEXT = "jsonld.context.minimal";
@@ -50,7 +54,7 @@ public class ConfigUtil {
      */
     public static Stream<String> props() {
         return concat(System.getenv().keySet().stream(), System.getProperties().stringPropertyNames().stream())
-                .map(ConfigUtil::toPropName);
+            .map(ConfigUtil::toPropName);
     }
 
     /**
@@ -64,15 +68,15 @@ public class ConfigUtil {
      * <code>my.lovely.property</code>, and will result in a map entry with key <code>abc.123</code> and value
      * <code>myValue</code>
      *
-     * @param props Stream of property names.
+     * @param props  Stream of property names.
      * @param prefix The prefix used to select and truncate property names.
      * @return map of truncated property names to values.
      */
     public static Map<String, String> extract(Stream<String> props, String prefix) {
         return props
-                .filter(key -> key.startsWith(toPropName(prefix)))
-                .filter(prop -> getValue(prop) != null)
-                .collect(Collectors.toMap(prop -> removePrefix(prefix, prop), prop -> getValue(prop)));
+            .filter(key -> key.startsWith(toPropName(prefix)))
+            .filter(prop -> getValue(prop) != null)
+            .collect(Collectors.toMap(prop -> removePrefix(prefix, prop), prop -> getValue(prop)));
     }
 
     public static String getValue(String key) {

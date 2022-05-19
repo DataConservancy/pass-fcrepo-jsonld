@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -43,7 +42,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.dataconservancy.fcrepo.jsonld.LogUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,21 +79,21 @@ public class SubstitutionResponseFilter implements Filter {
         LogUtil.adjustLogLevels();
 
         extract(props(), SUBSTITUTION_RESPONSE_HOST)
-                .entrySet().stream().forEach(e -> hosts.put(e.getValue(), e.getKey()));
+            .entrySet().stream().forEach(e -> hosts.put(e.getValue(), e.getKey()));
 
         terms = extract(props(), SUBSTITUTION_RESPONSE_TERM);
         replacements = extract(props(), SUBSTITUTION_RESPONSE_REPLACEMENT);
         types = extract(props(), SUBSTITUTION_RESPONSE_TYPES);
 
         hosts.entrySet().forEach(host -> LOG.info("{}: Replacing {} with {}",
-                host.getKey(),
-                terms.get(host.getValue()),
-                replacements.get(host.getValue())));
+                                                  host.getKey(),
+                                                  terms.get(host.getValue()),
+                                                  replacements.get(host.getValue())));
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
+        ServletException {
 
         final String host = ((HttpServletRequest) request).getHeader("host");
         final String key = hosts.get(host);
@@ -105,8 +103,8 @@ public class SubstitutionResponseFilter implements Filter {
             return;
         }
 
-        chain.doFilter(request, new BodyReplacingFilter((HttpServletResponse) response, body -> body.replace(terms
-                .get(key), replacements.get(key)), types.get(key)));
+        chain.doFilter(request, new BodyReplacingFilter((HttpServletResponse) response, body ->
+            body.replace(terms.get(key), replacements.get(key)), types.get(key)));
     }
 
     @Override
@@ -127,7 +125,7 @@ public class SubstitutionResponseFilter implements Filter {
          * @param response
          */
         public BodyReplacingFilter(HttpServletResponse response, Function<String, String> transform,
-                String mediaTypes) {
+                                   String mediaTypes) {
             super(response);
             this.transform = transform;
             this.mediaTypes = Optional.ofNullable(mediaTypes).orElse("");

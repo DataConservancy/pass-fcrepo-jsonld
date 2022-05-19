@@ -17,7 +17,6 @@
 package org.dataconservancy.fcrepo.jsonld.request;
 
 import java.io.IOException;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -28,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.dataconservancy.fcrepo.jsonld.LogUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +45,7 @@ public class UriProtocolFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
+        ServletException {
 
         final HttpServletRequest req = ((HttpServletRequest) request);
 
@@ -60,7 +58,7 @@ public class UriProtocolFilter implements Filter {
                 @Override
                 public StringBuffer getRequestURL() {
                     return new StringBuffer(super.getRequestURL().toString()
-                            .replaceFirst("^https?:", proto.getProtocol() + ":"));
+                                                 .replaceFirst("^https?:", proto.getProtocol() + ":"));
                 }
             }, response);
         } else {

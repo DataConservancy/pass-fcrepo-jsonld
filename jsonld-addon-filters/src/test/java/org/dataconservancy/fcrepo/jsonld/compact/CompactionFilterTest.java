@@ -31,7 +31,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Paths;
-
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -43,7 +42,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dataconservancy.fcrepo.jsonld.test.JsonldTestUtil;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -108,7 +106,7 @@ public class CompactionFilterTest {
 
             @Override
             public void doFilter(ServletRequest request, ServletResponse response) throws IOException,
-                    ServletException {
+                ServletException {
                 CompactionFilterTest.this.filteredResponse = (HttpServletResponse) response;
             }
         };
@@ -146,7 +144,7 @@ public class CompactionFilterTest {
     private static String getContextFileLocation() {
         try {
             return Paths.get(JsonldTestUtil.class.getResource("/preload-context.jsonld").toURI()).toFile()
-                    .getAbsolutePath();
+                        .getAbsolutePath();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }

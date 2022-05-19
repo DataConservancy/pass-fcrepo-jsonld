@@ -22,9 +22,8 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import org.fcrepo.client.FcrepoResponse;
-
 import org.apache.commons.io.IOUtils;
+import org.fcrepo.client.FcrepoResponse;
 
 /**
  * @author apb@jhu.edu
@@ -32,7 +31,7 @@ import org.apache.commons.io.IOUtils;
 public interface FcrepoIT {
 
     static final String fcrepoBaseURI = String.format("http://localhost:%s/%s/rest/", System.getProperty(
-            "fcrepo.dynamic.test.port", "8080"), System.getProperty("fcrepo.cxtPath", "fcrepo"));
+        "fcrepo.dynamic.test.port", "8080"), System.getProperty("fcrepo.cxtPath", "fcrepo"));
 
     default <T> T attempt(final int times, final Callable<T> it) {
 

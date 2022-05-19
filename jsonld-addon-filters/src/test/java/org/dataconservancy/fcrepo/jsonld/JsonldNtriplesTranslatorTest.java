@@ -25,13 +25,12 @@ import static org.junit.Assert.fail;
 import java.io.StringReader;
 import java.net.URL;
 
+import com.github.jsonldjava.core.JsonLdOptions;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.github.jsonldjava.core.JsonLdOptions;
 
 /**
  * @author apb@jhu.edu
@@ -46,12 +45,12 @@ public class JsonldNtriplesTranslatorTest {
         options = new JsonLdOptions();
 
         addStaticContext(new URL("http://example.org/farm.jsonld"), JsonldNtriplesTranslatorTest.class
-                .getResourceAsStream("/context.jsonld"),
-                options);
+                             .getResourceAsStream("/context.jsonld"),
+                         options);
 
         addStaticContext(new URL("http://example.org/farm-aliased.jsonld"), JsonMergePatchTranslatorTest.class
-                .getResourceAsStream("/context-aliased.jsonld"),
-                options);
+                             .getResourceAsStream("/context-aliased.jsonld"),
+                         options);
     }
 
     /* Verifies that the null relative URI is OK */
@@ -93,14 +92,14 @@ public class JsonldNtriplesTranslatorTest {
         final JsonldNtriplesTranslator nonValidating = new JsonldNtriplesTranslator(options, false, false);
 
         final String unexpected = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"unexpectedProperty\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"], " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}";
+                                  "\"@id\": \"test:123\", " +
+                                  "\"@type\": \"Cow\", " +
+                                  "\"unexpectedProperty\": true, " +
+                                  "\"milkVolume\": 100.6, " +
+                                  "\"barn\": \"test:/barn\", " +
+                                  "\"calves\": [\"test:/1\", \"test:2\"], " +
+                                  "\"@context\": \"http://example.org/farm.jsonld\"" +
+                                  "}";
 
         try {
             validating.translate(unexpected);
@@ -118,24 +117,24 @@ public class JsonldNtriplesTranslatorTest {
         final JsonldNtriplesTranslator validating = new JsonldNtriplesTranslator(options, true, false);
 
         final String badAlias = "{ " +
-                "\"id\": \"test:123\", " +
-                "\"type\": \"Cow\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"], " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}";
+                                "\"id\": \"test:123\", " +
+                                "\"type\": \"Cow\", " +
+                                "\"healthy\": true, " +
+                                "\"milkVolume\": 100.6, " +
+                                "\"barn\": \"test:/barn\", " +
+                                "\"calves\": [\"test:/1\", \"test:2\"], " +
+                                "\"@context\": \"http://example.org/farm.jsonld\"" +
+                                "}";
 
         final String goodAlias = "{ " +
-                "\"id\": \"test:123\", " +
-                "\"type\": \"Cow\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"], " +
-                "\"@context\": \"http://example.org/farm-aliased.jsonld\"" +
-                "}";
+                                 "\"id\": \"test:123\", " +
+                                 "\"type\": \"Cow\", " +
+                                 "\"healthy\": true, " +
+                                 "\"milkVolume\": 100.6, " +
+                                 "\"barn\": \"test:/barn\", " +
+                                 "\"calves\": [\"test:/1\", \"test:2\"], " +
+                                 "\"@context\": \"http://example.org/farm-aliased.jsonld\"" +
+                                 "}";
 
         try {
             validating.translate(badAlias);
@@ -154,13 +153,13 @@ public class JsonldNtriplesTranslatorTest {
         final JsonldNtriplesTranslator nonValidating = new JsonldNtriplesTranslator(options, false, false);
 
         final String noId = "{ " +
-                "\"@type\": \"Cow\", " +
-                "\"unexpectedProperty\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"], " +
-                "\"@context\": \"http://example.org/farm.jsonld\"" +
-                "}";
+                            "\"@type\": \"Cow\", " +
+                            "\"unexpectedProperty\": true, " +
+                            "\"milkVolume\": 100.6, " +
+                            "\"barn\": \"test:/barn\", " +
+                            "\"calves\": [\"test:/1\", \"test:2\"], " +
+                            "\"@context\": \"http://example.org/farm.jsonld\"" +
+                            "}";
 
         try {
             validating.translate(noId);
@@ -180,14 +179,14 @@ public class JsonldNtriplesTranslatorTest {
         final String DESIRED_CONTEXT = "http://example.org/farm-aliased.jsonld";
 
         final String withContext = "{ " +
-                "\"@id\": \"test:123\", " +
-                "\"@type\": \"Cow\", " +
-                "\"healthy\": true, " +
-                "\"milkVolume\": 100.6, " +
-                "\"barn\": \"test:/barn\", " +
-                "\"calves\": [\"test:/1\", \"test:2\"], " +
-                "\"@context\": \"http://example.org/farm-aliased.jsonld\"" +
-                "}";
+                                   "\"@id\": \"test:123\", " +
+                                   "\"@type\": \"Cow\", " +
+                                   "\"healthy\": true, " +
+                                   "\"milkVolume\": 100.6, " +
+                                   "\"barn\": \"test:/barn\", " +
+                                   "\"calves\": [\"test:/1\", \"test:2\"], " +
+                                   "\"@context\": \"http://example.org/farm-aliased.jsonld\"" +
+                                   "}";
 
         final String triples = t.translate(withContext);
 
