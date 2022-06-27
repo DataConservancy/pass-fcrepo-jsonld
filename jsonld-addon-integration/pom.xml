@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.dataconservancy.fcrepo</groupId>
+    <groupId>org.eclipse.pass</groupId>
     <artifactId>jsonld-addon</artifactId>
     <version>0.0.7-SNAPSHOT</version>
   </parent>
@@ -111,7 +111,7 @@
             </systemProperties>
             <dependencies>
               <dependency>
-                <groupId>org.dataconservancy.fcrepo</groupId>
+                <groupId>org.eclipse.pass</groupId>
                 <artifactId>jsonld-addon-filters</artifactId>
                 <classifier>shaded</classifier>
               </dependency>
@@ -163,7 +163,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.dataconservancy.fcrepo</groupId>
+      <groupId>org.eclipse.pass</groupId>
       <artifactId>jsonld-addon-filters</artifactId>
       <version>${project.version}</version>
       <classifier>shaded</classifier>
@@ -217,7 +217,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.dataconservancy.fcrepo</groupId>
+      <groupId>org.eclipse.pass</groupId>
       <artifactId>jsonld-addon-tests</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
@@ -233,6 +233,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
+
 
   </dependencies>
 </project>
