@@ -1,5 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.eclipse.pass</groupId>
     <artifactId>eclipse-pass-parent</artifactId>
@@ -19,6 +21,7 @@
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
+
   <developers>
     <developer>
       <name>Aaron Birkland</name>
@@ -58,6 +61,19 @@
     </developer>
   </developers>
 
+  <modules>
+    <module>jsonld-addon-filters</module>
+    <module>jsonld-addon-integration</module>
+    <module>jsonld-addon-tests</module>
+  </modules>
+
+  <scm>
+    <connection>scm:git:https://github.com/DataConservancy/fcrepo-jsonld.git</connection>
+    <developerConnection>scm:git:https://github.com/DataConservancy/fcrepo-jsonld.git</developerConnection>
+    <url>https://github.com/DataConservancy/fcrepo-jsonld</url>
+    <tag>HEAD</tag>
+  </scm>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -93,6 +109,97 @@
     <maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.jsonld-java</groupId>
+        <artifactId>jsonld-java</artifactId>
+        <version>${jsonld.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.unitils</groupId>
+        <artifactId>unitils-core</artifactId>
+        <version>${unitils.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.fcrepo.client</groupId>
+        <artifactId>fcrepo-java-client</artifactId>
+        <version>${fcrepo-java-client.version}</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>uk.com.robust-it</groupId>
+        <artifactId>cloning</artifactId>
+        <version>${cloning.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>${javax.servlet.version}</version>
+        <scope>provided</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <repositories>
+    <repository>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 
   <build>
     <pluginManagement>
@@ -175,7 +282,6 @@
 
       </plugins>
     </pluginManagement>
-
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -196,107 +302,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jcl-over-slf4j</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>${logback.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.github.jsonld-java</groupId>
-        <artifactId>jsonld-java</artifactId>
-        <version>${jsonld.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>${mockito.version}</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.unitils</groupId>
-        <artifactId>unitils-core</artifactId>
-        <version>${unitils.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.fcrepo.client</groupId>
-        <artifactId>fcrepo-java-client</artifactId>
-        <version>${fcrepo-java-client.version}</version>
-        <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>uk.com.robust-it</groupId>
-        <artifactId>cloning</artifactId>
-        <version>${cloning.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>${javax.servlet.version}</version>
-        <scope>provided</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
-  <scm>
-    <connection>scm:git:https://github.com/DataConservancy/fcrepo-jsonld.git</connection>
-    <developerConnection>scm:git:https://github.com/DataConservancy/fcrepo-jsonld.git</developerConnection>
-    <url>https://github.com/DataConservancy/fcrepo-jsonld</url>
-    <tag>HEAD</tag>
-  </scm>
-
-  <modules>
-    <module>jsonld-addon-filters</module>
-    <module>jsonld-addon-integration</module>
-    <module>jsonld-addon-tests</module>
-  </modules>
-  <repositories>
-    <repository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
 </project>
