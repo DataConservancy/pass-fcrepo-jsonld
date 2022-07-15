@@ -1,10 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.eclipse.pass</groupId>
     <artifactId>jsonld-addon</artifactId>
     <version>0.1.0-SNAPSHOT</version>
   </parent>
+
   <artifactId>jsonld-addon-integration</artifactId>
 
   <properties>
@@ -20,17 +23,81 @@
     <compaction.preload.file.farm>${project.basedir}/src/test/resources/context.jsonld</compaction.preload.file.farm>
   </properties>
 
-  <profiles>
-    <profile>
-      <id>standard</id>
-      <properties>
-        <fcrepo.dynamic.test.port>8080</fcrepo.dynamic.test.port>
-        <fcrepo.dynamic.jms.port>61616</fcrepo.dynamic.jms.port>
-        <fcrepo.dynamic.stomp.port>61613</fcrepo.dynamic.stomp.port>
-      </properties>
-    </profile>
-  </profiles>
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.pass</groupId>
+      <artifactId>jsonld-addon-filters</artifactId>
+      <version>${project.version}</version>
+      <classifier>shaded</classifier>
+      <scope>test</scope>
+    </dependency>
 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-webapp</artifactId>
+      <version>${fcrepo.version}</version>
+      <type>war</type>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-fuseki-war</artifactId>
+      <version>2.4.1</version>
+      <type>war</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fcrepo.client</groupId>
+      <artifactId>fcrepo-java-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.pass</groupId>
+      <artifactId>jsonld-addon-tests</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.unitils</groupId>
+      <artifactId>unitils-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+
+
+  </dependencies>
 
   <build>
     <plugins>
@@ -157,82 +224,16 @@
         </executions>
       </plugin>
     </plugins>
-
   </build>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.eclipse.pass</groupId>
-      <artifactId>jsonld-addon-filters</artifactId>
-      <version>${project.version}</version>
-      <classifier>shaded</classifier>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>fcrepo-webapp</artifactId>
-      <type>war</type>
-      <version>${fcrepo.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.jena</groupId>
-      <artifactId>jena-fuseki-war</artifactId>
-      <version>2.4.1</version>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.fcrepo.client</groupId>
-      <artifactId>fcrepo-java-client</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.pass</groupId>
-      <artifactId>jsonld-addon-tests</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.unitils</groupId>
-      <artifactId>unitils-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-    </dependency>
-
-
-  </dependencies>
+  <profiles>
+    <profile>
+      <id>standard</id>
+      <properties>
+        <fcrepo.dynamic.test.port>8080</fcrepo.dynamic.test.port>
+        <fcrepo.dynamic.jms.port>61616</fcrepo.dynamic.jms.port>
+        <fcrepo.dynamic.stomp.port>61613</fcrepo.dynamic.stomp.port>
+      </properties>
+    </profile>
+  </profiles>
 </project>
