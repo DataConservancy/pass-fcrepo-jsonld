@@ -195,8 +195,9 @@ public class CompactionFilter implements Filter {
                 }
                 return orig;
             } else if (name.equalsIgnoreCase("prefer")) {
-                // Ignore requests to modify representation since this filter overriding them.
-                if (orig != null && orig.startsWith("return=representation;")) {
+                // Ignore requests to modify representation since this filter overriding them unless it is a request
+                // for inbound references. The PASS Java client has a getIncoming method which relies on it.
+                if (orig != null && orig.startsWith("return=representation;") && !orig.contains("http://fedora.info/definitions/v4/repository#InboundReferences")) {
                     final String prefers = "return=representation";
                     LOG.debug("Transforming original prefer header {} into  {}", orig, prefers);
                     return prefers;
