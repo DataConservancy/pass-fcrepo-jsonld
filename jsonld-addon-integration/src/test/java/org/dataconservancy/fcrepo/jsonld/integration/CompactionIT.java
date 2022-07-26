@@ -198,8 +198,7 @@ public class CompactionIT implements FcrepoIT {
             assertTrue(ids.contains(childJsonldResource1.toString()));
             assertTrue(ids.contains(jsonldResource.toString()));
 
-            assertNotNull(response.getHeaderValue("X-CREATED"));
-            assertNotNull(response.getHeaderValue("X-MODIFIED"));
+            // In this case no support for X-CREATED and X-MODIFIED
         }
     }
 
